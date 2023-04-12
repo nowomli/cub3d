@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../so_long"
+		},
+		{
+			"path": "../auxiliar"
+		},
+		{
+			"path": "../evaluation/Cub3d"
+		},
+		{
+			"path": "../cpp00/ex01"
+		},
+		{
+			"path": "../AnnAndCub"
+		}
+	],
+	"settings": {}
+}
