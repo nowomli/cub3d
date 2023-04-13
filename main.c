@@ -6,7 +6,7 @@
 /*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/13 01:45:04 by inovomli         ###   ########.fr       */
+/*   Updated: 2023/04/13 02:06:50 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 
 #define WIDTH 512
 #define HEIGHT 512
-#define STEP 0.06f
+#define STEP 0.09f
 # define TURN_ANGLE 0.10f
 #define RTSTEP 0.001f
 
@@ -193,7 +193,7 @@ void redraw_all(t_cub3d *s_cub)
 				
 				if (s_cub->mintwo && s_cub->minone)
 				{
-					if ((s_cub->mintwo != s_cub->minone) && (s_cub->mintwo == wrk_texture))
+					if ((s_cub->mintwo != s_cub->minone) && (s_cub->mintwo == wrk_texture) && (i > 1))
 					{
 						draw_txtr_line(wrk_texture, column_height, x1, s_cub, i-1, y1);
 						s_cub->minone = wrk_texture;
@@ -217,19 +217,6 @@ int check_wall(t_cub3d *s_cub, float dispX, float dispY)
 	int newX;
 	int newY;
 
-	// newX = (int)(s_cub->pl_pos->x + dispX);
-	// newY = (int)(s_cub->pl_pos->y + dispY);
-	// if (s_cub->tmp_map[newY][newX] == '0')
-	// 	return (1);	
-	// // printf("dx=%f, dy=%f", dispX,dispY);
-	// if (dispX < 0.00001)
-	// 	dispX = (-3)*STEP;
-	// else
-	// 	dispX = (3)*STEP;
-	// if (dispY < 0.00001)
-	// 	dispY = (-3)*STEP;
-	// else
-	// 	dispY = (3)*STEP;
 	newX = (int)(s_cub->pl_pos->x + dispX);
 	newY = (int)(s_cub->pl_pos->y + dispY);		
 	if (s_cub->tmp_map[newY][newX] == '0')
@@ -302,7 +289,6 @@ void ft_key_hook(mlx_key_data_t keydata, void *param)
 	else if (keydata.key == MLX_KEY_RIGHT && (keydata.action == MLX_PRESS
 			|| keydata.action == MLX_REPEAT))
 		move_pl(s_cub, rot_rt);			
-	
 }
 
 void mlx_resize(int32_t width, int32_t height, void* param)
@@ -327,7 +313,6 @@ void ft_hook(void* param)
 	t_cub3d	*s_cub;
 
 	s_cub = (t_cub3d *)param;	
-
 	if (mlx_is_key_down(s_cub->mlx, MLX_KEY_ESCAPE))
 		mlx_close_window(s_cub->mlx);
 	 if (mlx_is_key_down(s_cub->mlx, MLX_KEY_D))
@@ -397,8 +382,8 @@ int32_t main(int32_t argc, char* argv[])	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	loaded_map_st.WE = mlx_load_png("imgs/mss.png");
 	
 	t_player player;
-	player.x = 2.1f;
-	player.y = 2.4f;
+	player.x = 2.5f;
+	player.y = 5.4f;
 	player.angle = 1.5*M_PI;
 
 	// main_cub.mlx = mlx;
