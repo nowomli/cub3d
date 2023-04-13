@@ -6,11 +6,12 @@
 /*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/13 02:06:50 by inovomli         ###   ########.fr       */
+/*   Updated: 2023/04/13 18:11:42 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //	gcc main.c MLX42/build/libmlx42.a -Iinclude -ldl -lglfw -L "$(brew --prefix glfw)/lib/" -pthread -lm
+// gcc main.c MLX42/build/libmlx42.a -Iinclude -ldl -lglfw -L "$(brew --prefix glfw)/lib/" -pthread -lm -L../LeakSanitizer -llsan -lc++   -Wno-gnu-include-next -I ../LeakSanitizer/include
 
 #include <unistd.h>
 #include <stdio.h>
@@ -27,14 +28,8 @@
 #define WIDTH 512
 #define HEIGHT 512
 #define STEP 0.09f
-# define TURN_ANGLE 0.10f
+#define TURN_ANGLE 0.10f
 #define RTSTEP 0.001f
-
-static mlx_image_t* image;
-static mlx_image_t* new_image;
-
-static mlx_image_t* floor0;
-static mlx_image_t* ceiling;
 
 typedef enum e_mv_dir{not_set = 0, up, dw, lf, rt, rot_lf, rot_rt} mv_dir;
 
@@ -60,7 +55,6 @@ typedef struct s_map
 
 typedef struct s_cub3D
 {
-	// float 
 	mlx_texture_t	*minone;
 	mlx_texture_t	*mintwo;	
 	float view_angle;
@@ -69,6 +63,7 @@ typedef struct s_cub3D
 	t_player 	*pl_pos;
 	mlx_image_t *cur_img;
 	char	**tmp_map;
+	mlx_image_t* image;
 } t_cub3d;
 
 
@@ -77,18 +72,6 @@ typedef struct s_cub3D
 int32_t ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
 {
     return (r << 24 | g << 16 | b << 8 | a);
-}
-
-void ft_randomize(void* param)
-{
-	for (int32_t i = 0; i < image->width; ++i)
-	{
-		for (int32_t y = 0; y < image->height; ++y)
-		{
-			uint32_t color = ft_pixel(61, 230, 37, 255);
-			mlx_put_pixel(image, i, y, color);
-		}
-	}
 }
 
 int	get_color(mlx_texture_t *texture, int x_coord, int y_coord)
@@ -101,6 +84,7 @@ int	get_color(mlx_texture_t *texture, int x_coord, int y_coord)
 		texture->pixels[byte + 2], texture->pixels[byte + 3]);
 	return (color);
 }
+
 int min(int a, int b)
 {
 	if (a <= b)
@@ -114,53 +98,65 @@ int max(int a, int b)
 	return b;
 }
 
-void draw_txtr_line(mlx_texture_t *txtr, size_t cl_h, float x1, t_cub3d *s_cub, int i, float y1)
+void draw_txtr_line(mlx_texture_t *txtr, size_t cl_h, float x1, t_cub3d *s_cub, int i, float y1) // NOT OK
 {
 	int txt_x;
 	int txt_y1;
 	int txt_x1;
-	uint32_t colorX = ft_pixel(61, 230, 37, 255);
-	uint32_t colorY = ft_pixel(255, 255, 0, 255);
+	int32_t y;
 
-	for (int32_t y = 0; y < cl_h && y < s_cub->mlx->height; ++y) 
+	y = 0;
+	while (y < cl_h && y < s_cub->mlx->height )
 	{
 		txt_x = txtr->width * ((float)x1 - (int)x1);
-		txt_y1 = ((cl_h - s_cub->mlx->height) *(cl_h > s_cub->mlx->height) / 2 + y) * txtr->height / (cl_h + 0.00001f);
+		if (cl_h > s_cub->mlx->height)
+			txt_y1 = ((cl_h - s_cub->mlx->height)/ 2 + y) 
+			* txtr->height / (cl_h + 0.00001f);
+		else
+			txt_y1 = y * txtr->height / (cl_h + 0.00001f);
 		txt_x1 = txtr->width * ((float)y1 - (int)y1);
 		int clll = min(cl_h, s_cub->mlx->height);
 		int yyy = min(max((int)((s_cub->mlx->height - clll)/2+ y), 0), s_cub->mlx->height);
 		if 	((txtr == s_cub->c_map->NO) || (txtr == s_cub->c_map->SO))
-			mlx_put_pixel(image, i, yyy, get_color(txtr, txt_x, (int)txt_y1));
+			mlx_put_pixel(s_cub->image, i, yyy, get_color(txtr, txt_x, (int)txt_y1));
 		if 	((txtr == s_cub->c_map->WE) || (txtr == s_cub->c_map->EA))
-			mlx_put_pixel(image, i, yyy, get_color(txtr, txt_x1, txt_y1));
+			mlx_put_pixel(s_cub->image, i, yyy, get_color(txtr, txt_x1, txt_y1));
+		++y;
 	}
-	
 }
 
-void redraw_all(t_cub3d *s_cub)
+typedef struct s_rcast
 {
-	static int counter = 0;
+	mlx_texture_t	*wrk_t;
+	float x1;
+	float y1;
+	float ang;
+	float dist;
+} t_raycst;
+
+void redraw_all(t_cub3d *s_cub) // NOT OK !!!!!!!!!!!!!
+{
+	mlx_texture_t	*wrk_txt; // replase
 
 	mlx_t* mlx = s_cub->mlx;
 	t_player player = *(s_cub->pl_pos);
 	float view_angle = s_cub->view_angle;
 
-		mlx_texture_t	*wrk_texture;
-		image = mlx_new_image(mlx, mlx->width, mlx->height);
-				uint32_t f_color = ft_pixel(255, 0, 0, 255);
-				uint32_t c_color = ft_pixel(116, 96, 31, 255);
-		for (int32_t i = 0; i < s_cub->mlx->width; ++i)
+	// floor ceiling start
+	mlx_delete_image(s_cub->mlx, s_cub->image);
+	s_cub->image = mlx_new_image(mlx, mlx->width, mlx->height);
+	for (int32_t i = 0; i < s_cub->mlx->width; ++i)
+	{
+		for (int32_t y = 0; y < s_cub->mlx->height; ++y)
 		{
-			for (int32_t y = 0; y < s_cub->mlx->height; ++y)
-			{
-				if (y < s_cub->mlx->height/2)
-					mlx_put_pixel(image, i, y, f_color);
-				else
-					mlx_put_pixel(image, i, y, c_color);
-			}
+			if (y < s_cub->mlx->height/2)
+				mlx_put_pixel(s_cub->image, i, y, s_cub->c_map->f_color);
+			else
+				mlx_put_pixel(s_cub->image, i, y, s_cub->c_map->c_color);
 		}
-
-	uint32_t colorX = ft_pixel(61, 230, 37, 255);
+	}
+	// end floor ceiling
+	
 	for (int i = 0; i < mlx->width; i++)
 	{
 		float ang = player.angle - view_angle/2 + (view_angle * i) / mlx->width;
@@ -168,46 +164,42 @@ void redraw_all(t_cub3d *s_cub)
 		{
 			float x1 = player.x + dist * cosf(ang);
 			float y1 = player.y + dist * sinf(ang);
-			if (((int)y1 >= 0) && ((int)y1 < 13) && ((int)x1 >= 0) && ((int)x1 < 7) && (s_cub->tmp_map[(int)y1][(int)x1] != '0'))
+			if (((int)y1 >= 0) && ((int)y1 < s_cub->c_map->rows) && ((int)x1 >= 0) && ((int)x1 < s_cub->c_map->column ) && (s_cub->tmp_map[(int)y1][(int)x1] != '0'))
 			{
-				size_t column_height = s_cub->mlx->height/(dist*cosf(ang-player.angle));
-				
+				size_t column_height = s_cub->mlx->height/(dist*cosf(ang-player.angle));				
 				// start
 				dist -= RTSTEP;
 				x1 = player.x + dist * cosf(ang);
 				y1 = player.y + dist * sinf(ang);
 				if (fabs(x1 -(int)x1) < fabs(1 - x1 + (int)x1) && fabs(x1 -(int)x1) < fabs(1 - y1 + (int)y1) && fabs(x1 -(int)x1) < fabs(y1 - (int)y1))
-					wrk_texture	= s_cub->c_map->WE; // mss
+					wrk_txt	= s_cub->c_map->WE; // mss
 				if (fabs(1 - x1 + (int)x1) < fabs(x1 -(int)x1) && fabs(1 - x1 + (int)x1) < fabs(1 - y1 + (int)y1) && fabs(1 - x1 + (int)x1) < fabs(y1 - (int)y1))
-					wrk_texture	= s_cub->c_map->EA; // cls	
+					wrk_txt	= s_cub->c_map->EA; // cls	
 				if (fabs(y1 - (int)y1)< fabs(1 - x1 + (int)x1) && fabs(y1 - (int)y1) < fabs(x1 -(int)x1) && fabs(y1 - (int)y1) < fabs(1 - y1 + (int)y1))
-					wrk_texture	= s_cub->c_map->NO; // bls
+					wrk_txt	= s_cub->c_map->NO; // bls
 				if (fabs(1 - y1 + (int)y1) < fabs(1 - x1 + (int)x1) && fabs(1 - y1 + (int)y1) < fabs(y1 - (int)y1) && fabs(1 - y1 + (int)y1) < fabs(x1 -(int)x1))
-					wrk_texture	= s_cub->c_map->SO; // grs										
+					wrk_txt	= s_cub->c_map->SO; // grs										
 				// end
-
 				if (s_cub->mintwo == NULL)
-					s_cub->mintwo = wrk_texture;
+					s_cub->mintwo = wrk_txt;
 				else if (s_cub->minone == NULL)
-					s_cub->minone = wrk_texture;
-				
+					s_cub->minone = wrk_txt;				
 				if (s_cub->mintwo && s_cub->minone)
 				{
-					if ((s_cub->mintwo != s_cub->minone) && (s_cub->mintwo == wrk_texture) && (i > 1))
+					if ((s_cub->mintwo != s_cub->minone) && (s_cub->mintwo == wrk_txt) && (i > 1))
 					{
-						draw_txtr_line(wrk_texture, column_height, x1, s_cub, i-1, y1);
-						s_cub->minone = wrk_texture;
+						draw_txtr_line(wrk_txt, column_height, x1, s_cub, i-1, y1);
+						s_cub->minone = wrk_txt;
 					}
 					s_cub->mintwo = s_cub->minone;
-					s_cub->minone = wrk_texture;
+					s_cub->minone = wrk_txt;
 				}
-
-				draw_txtr_line(wrk_texture, column_height, x1, s_cub, i, y1);
+				draw_txtr_line(wrk_txt, column_height, x1, s_cub, i, y1);
 				break;
 			}
 		}
 	}
-	mlx_image_to_window(mlx, image, 0, 0) ;
+	mlx_image_to_window(mlx, s_cub->image, 0, 0) ;
 }
 
 
@@ -225,10 +217,13 @@ int check_wall(t_cub3d *s_cub, float dispX, float dispY)
 		return (0);
 }
 
-void move_pl(t_cub3d *s_cub, mv_dir dir)
+void move_pl(t_cub3d *s_cub, mv_dir dir) // NOT OK
 {
-	float dx = STEP * cosf(s_cub->pl_pos->angle);
-	float dy = STEP * sinf(s_cub->pl_pos->angle);
+	float dx;
+	float dy;
+
+	dx = STEP * cosf(s_cub->pl_pos->angle);
+	dy = STEP * sinf(s_cub->pl_pos->angle);
 	if (dir == rt) 
 	{
 		if (check_wall(s_cub, -dy, 0))
@@ -315,17 +310,17 @@ void ft_hook(void* param)
 	s_cub = (t_cub3d *)param;	
 	if (mlx_is_key_down(s_cub->mlx, MLX_KEY_ESCAPE))
 		mlx_close_window(s_cub->mlx);
-	 if (mlx_is_key_down(s_cub->mlx, MLX_KEY_D))
+	else if (mlx_is_key_down(s_cub->mlx, MLX_KEY_D))
 		move_pl(s_cub, rt);
-	 if (mlx_is_key_down(s_cub->mlx, MLX_KEY_A))
+	else if (mlx_is_key_down(s_cub->mlx, MLX_KEY_A))
 		move_pl(s_cub, lf);
-	 if (mlx_is_key_down(s_cub->mlx, MLX_KEY_W))
+	else if (mlx_is_key_down(s_cub->mlx, MLX_KEY_W))
 		move_pl(s_cub, up);
-	 if (mlx_is_key_down(s_cub->mlx, MLX_KEY_S))
+	else if (mlx_is_key_down(s_cub->mlx, MLX_KEY_S))
 		move_pl(s_cub, dw);
-	 if (mlx_is_key_down(s_cub->mlx, MLX_KEY_RIGHT))
+	else if (mlx_is_key_down(s_cub->mlx, MLX_KEY_RIGHT))
 		move_pl(s_cub, rot_rt);
-	 if (mlx_is_key_down(s_cub->mlx, MLX_KEY_LEFT))
+	else if (mlx_is_key_down(s_cub->mlx, MLX_KEY_LEFT))
 		move_pl(s_cub, rot_lf);
 }
 
@@ -359,9 +354,29 @@ char	**feed_map(char *path) //(t_map *wmap, char *path)
 	return (hope);
 }
 
+	// system("leaks a.out");
+void	checkleaks(void)
+{
+		system("leaks a.out");
+	// system("leaks so_long");
+}
+
+void	tdimarr_clear(char	**arrclear)
+{
+	int	i;
+
+	i = 0;
+	while (arrclear[i])
+	{
+		free(arrclear[i]);
+		i++;
+	}
+	free(arrclear);
+}
+
 int32_t main(int32_t argc, char* argv[])	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 {
-
+	// atexit(checkleaks);
 	t_cub3d main_cub;
 
 	if (!(main_cub.mlx = mlx_init(WIDTH, HEIGHT, "MLX42", true)))
@@ -380,43 +395,39 @@ int32_t main(int32_t argc, char* argv[])	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	loaded_map_st.NO = mlx_load_png("imgs/bls.png");
 	loaded_map_st.SO = mlx_load_png("imgs/grs.png");
 	loaded_map_st.WE = mlx_load_png("imgs/mss.png");
+	loaded_map_st.f_color = ft_pixel(255, 0, 0, 255);
+	loaded_map_st.c_color = ft_pixel(116, 96, 31, 255);
+	loaded_map_st.column = 7;
+	loaded_map_st.rows = 13;
 	
 	t_player player;
 	player.x = 2.5f;
 	player.y = 5.4f;
 	player.angle = 1.5*M_PI;
 
-	// main_cub.mlx = mlx;
 	main_cub.tmp_map = map;
 	main_cub.pl_pos = &player;
 	main_cub.view_angle = M_PI/3;
 	main_cub.c_map = &loaded_map_st;
 	main_cub.minone = NULL;
 	main_cub.mintwo = NULL;
+	main_cub.image = mlx_new_image(main_cub.mlx, main_cub.mlx->width, main_cub.mlx->height);
 
 	redraw_all(&main_cub);
 
-	// if (!(image = mlx_new_image(mlx, 128, 128)))
-	// {
-	// 	mlx_close_window(mlx);
-	// 	puts(mlx_strerror(mlx_errno));
-	// 	return(EXIT_FAILURE);
-	// }
-	// if (mlx_image_to_window(mlx, image, 0, 128) == -1)
-	// {
-	// 	mlx_close_window(mlx);
-	// 	puts(mlx_strerror(mlx_errno));
-	// 	return(EXIT_FAILURE);
-	// }
-	
 	// mlx_loop_hook(mlx, ft_randomize, mlx);
 	mlx_loop_hook(main_cub.mlx, ft_hook, &main_cub);
-
 	// mlx_key_hook(main_cub.mlx, ft_key_hook, &main_cub);
 	// mlx_resize_hook(main_cub.mlx, mlx_resize, &main_cub);
-
 	mlx_loop(main_cub.mlx);
 	mlx_terminate(main_cub.mlx);
+
+mlx_delete_texture(loaded_map_st.EA);
+mlx_delete_texture(loaded_map_st.NO);
+mlx_delete_texture(loaded_map_st.SO);
+mlx_delete_texture(loaded_map_st.WE);
+tdimarr_clear(loaded_map_st.ar_map);
+
 	return (EXIT_SUCCESS);
 }
 
