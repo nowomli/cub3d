@@ -6,11 +6,12 @@
 /*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/14 17:16:51 by inovomli         ###   ########.fr       */
+/*   Updated: 2023/04/14 17:30:49 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//	gcc main.c MLX42/build/libmlx42.a -Iinclude -ldl -lglfw -L "$(brew --prefix glfw)/lib/" -pthread -lm
+//	gcc main.c MLX42/build/libmlx42.a -Iinclude -ldl -lglfw -L 
+// "$(brew --prefix glfw)/lib/" -pthread -lm
 
 // gcc main.c MLX42/build/libmlx42.a -Iinclude -ldl -lglfw -L
 // "$(brew --prefix glfw)/lib/" -pthread -lm -L../LeakSanitizer -llsan -lc++  
@@ -61,13 +62,12 @@ typedef struct s_cub3D
 {
 	mlx_texture_t	*minone;
 	mlx_texture_t	*mintwo;
-		mlx_texture_t	*minthree;
+	mlx_texture_t	*minthree;
 	float			view_angle;
 	mlx_t			*mlx;
 	t_map			*c_map;
 	t_player		*pl_pos;
 	mlx_image_t		*cur_img;
-	// char			**tmp_map;
 	mlx_image_t		*image;
 	bool			resize;
 }	t_cub3d;
@@ -188,12 +188,13 @@ mlx_texture_t	*determ_txt(t_cub3d *s_cub, t_raycst *raycst)
 	if (fabs(x1 -(int)x1) < fabs(1 - x1 + (int)x1) && fabs(x1 -(int)x1)
 		< fabs(1 - y1 + (int)y1) && fabs(x1 -(int)x1) < fabs(y1 - (int)y1))
 		wrk_txt = s_cub->c_map->we;
-	else if (fabs(1 - x1 + (int)x1) < fabs(x1 -(int)x1) && fabs(1 - x1 + (int)x1)
+	else if (fabs(1 - x1 + (int)x1) < fabs(x1 -(int)x1)
+		&& fabs(1 - x1 + (int)x1)
 		< fabs(1 - y1 + (int)y1) && fabs(1 - x1 + (int)x1) < fabs(y1 - (int)y1))
 		wrk_txt = s_cub->c_map->ea;
 	else if (fabs(y1 - (int)y1) < fabs(1 - x1 + (int)x1) && fabs(y1 - (int)y1)
 		< fabs(x1 - (int)x1) && fabs(y1 - (int)y1) < fabs(1 - y1 + (int)y1))
-		wrk_txt = s_cub->c_map->no;		
+		wrk_txt = s_cub->c_map->no;
 	else if (fabs(1 - y1 + (int)y1) < fabs(1 - x1 + (int)x1)
 		&& fabs(1 - y1 + (int)y1) < fabs(y1 - (int)y1)
 		&& fabs(1 - y1 + (int)y1) < fabs(x1 -(int)x1))
@@ -203,8 +204,8 @@ mlx_texture_t	*determ_txt(t_cub3d *s_cub, t_raycst *raycst)
 
 void	fix_artifact(t_cub3d *s_cub, mlx_texture_t *wrk_txt, t_raycst *rt)
 {
-	if (s_cub->minthree== NULL)
-		s_cub->minthree = wrk_txt;	
+	if (s_cub->minthree == NULL)
+		s_cub->minthree = wrk_txt;
 	else if (s_cub->mintwo == NULL)
 		s_cub->mintwo = wrk_txt;
 	else if (s_cub->minone == NULL)
@@ -275,8 +276,8 @@ int	check_wall(t_cub3d *s_cub, float dispX, float dispY)
 	int	new_x;
 	int	new_y;
 
-	new_x = (int)(s_cub->pl_pos->x + dispX*5);
-	new_y = (int)(s_cub->pl_pos->y + dispY*5);
+	new_x = (int)(s_cub->pl_pos->x + dispX * 5);
+	new_y = (int)(s_cub->pl_pos->y + dispY * 5);
 	if (s_cub->c_map->ar_map[new_y][new_x] == '0')
 		return (1);
 	else
@@ -377,7 +378,7 @@ void	move_pl(t_cub3d *s_cub, t_mv_dir dir)
 // 	redraw_all(s_cub);
 // }
 
-	// mlx_key_hook(main_cub.mlx, ft_key_hook, &main_cub);
+	// mlx_key_hook(m_cub.mlx, ft_key_hook, &m_cub);
 void	ft_key_hook(mlx_key_data_t keydata, void *param)
 {
 	t_cub3d	*s_cub;
@@ -428,34 +429,33 @@ void	ft_hook(void *param)
 
 // -----------------------------------------------------------------------------
 
-char	**feed_map(char *path)
-{
-	char **hope;
-	int rowsize = 13;
-	hope = malloc(sizeof(char *) * (rowsize + 1));
-	int i = 0;
+// char	**feed_map(char *path)
+// {
+// 	char	**hope;
+// 	int		rowsize = 13;
+// 	int i = 0;
 
-	char *filename = path;
-	FILE *fp = fopen(filename, "r");
+// 	char *filename = path;
+// 	FILE *fp = fopen(filename, "r");
 
-	if (fp == NULL)
-	{
-		printf("Error: could not open file %s", filename);
-		return 0;
-	}
-	const unsigned MAX_LENGTH = 256;
-	char buffer[MAX_LENGTH];
-	while (fgets(buffer, MAX_LENGTH, fp))
-	{
-		hope[i] = malloc(sizeof(char) * 9);
-		strcpy(hope[i++],buffer);
-		// printf("%s", buffer);
-	}
-	hope[i] = 0;
-	fclose(fp);
-	return (hope);
-}
-
+// 	hope = malloc(sizeof(char *) * (rowsize + 1));
+// 	if (fp == NULL)
+// 	{
+// 		printf("Error: could not open file %s", filename);
+// 		return 0;
+// 	}
+// 	const unsigned MAX_LENGTH = 256;
+// 	char buffer[MAX_LENGTH];
+// 	while (fgets(buffer, MAX_LENGTH, fp))
+// 	{
+// 		hope[i] = malloc(sizeof(char) * 9);
+// 		strcpy(hope[i++],buffer);
+// 		// printf("%s", buffer);
+// 	}
+// 	hope[i] = 0;
+// 	fclose(fp);
+// 	return (hope);
+// }
 
 // void	checkleaks(void)
 // {
@@ -476,18 +476,18 @@ void	tdimarr_clear(char	**arrclear)
 	free(arrclear);
 }
 
-int32_t	main(int32_t argc, char* argv[])
+int32_t	main(int32_t argc, char *argv[])
 {
-	t_cub3d main_cub;
-	t_map loaded_map_st;
-	t_player player;	
-	char **map;
+	t_cub3d		m_cub;
+	t_map		loaded_map_st;
+	t_player	player;
+	char		**map;
 
 	if (argc == 2)
 		map = feed_map(argv[1]);
 	else
 		return (1);
-	main_cub.mlx = mlx_init(WIDTH, HEIGHT, "MLX42", false);
+	m_cub.mlx = mlx_init(WIDTH, HEIGHT, "MLX42", false);
 
 	loaded_map_st.ar_map = map;
 	loaded_map_st.ea = mlx_load_png("imgs/cls.png");
@@ -501,20 +501,20 @@ int32_t	main(int32_t argc, char* argv[])
 
 	player.x = 2.5f;
 	player.y = 5.4f;
-	player.angle = 1.5*M_PI;
+	player.angle = 1.5 * M_PI;
 
-	main_cub.pl_pos = &player;
-	main_cub.view_angle = M_PI/3;
-	main_cub.c_map = &loaded_map_st;
-	main_cub.minone = NULL;
-	main_cub.mintwo = NULL;
-	main_cub.minthree = NULL;
-	main_cub.image = mlx_new_image(main_cub.mlx, main_cub.mlx->width, main_cub.mlx->height);
+	m_cub.pl_pos = &player;
+	m_cub.view_angle = M_PI / 3;
+	m_cub.c_map = &loaded_map_st;
+	m_cub.minone = NULL;
+	m_cub.mintwo = NULL;
+	m_cub.minthree = NULL;
+	m_cub.image = mlx_new_image(m_cub.mlx, m_cub.mlx->width, m_cub.mlx->height);
 
-	redraw_all(&main_cub);
-	mlx_loop_hook(main_cub.mlx, ft_hook, &main_cub);
-	mlx_loop(main_cub.mlx);
-	mlx_terminate(main_cub.mlx);
+	redraw_all(&m_cub);
+	mlx_loop_hook(m_cub.mlx, ft_hook, &m_cub);
+	mlx_loop(m_cub.mlx);
+	mlx_terminate(m_cub.mlx);
 
 	mlx_delete_texture(loaded_map_st.ea);
 	mlx_delete_texture(loaded_map_st.no);
