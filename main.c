@@ -6,12 +6,15 @@
 /*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/13 18:11:42 by inovomli         ###   ########.fr       */
+/*   Updated: 2023/04/14 17:16:51 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //	gcc main.c MLX42/build/libmlx42.a -Iinclude -ldl -lglfw -L "$(brew --prefix glfw)/lib/" -pthread -lm
-// gcc main.c MLX42/build/libmlx42.a -Iinclude -ldl -lglfw -L "$(brew --prefix glfw)/lib/" -pthread -lm -L../LeakSanitizer -llsan -lc++   -Wno-gnu-include-next -I ../LeakSanitizer/include
+
+// gcc main.c MLX42/build/libmlx42.a -Iinclude -ldl -lglfw -L
+// "$(brew --prefix glfw)/lib/" -pthread -lm -L../LeakSanitizer -llsan -lc++  
+// -Wno-gnu-include-next -I ../LeakSanitizer/include
 
 #include <unistd.h>
 #include <stdio.h>
@@ -28,229 +31,301 @@
 #define WIDTH 512
 #define HEIGHT 512
 #define STEP 0.09f
-#define TURN_ANGLE 0.10f
+#define TURN_ANGLE 0.05f
 #define RTSTEP 0.001f
 
-typedef enum e_mv_dir{not_set = 0, up, dw, lf, rt, rot_lf, rot_rt} mv_dir;
+typedef enum e_mv_dir{not_set = 0, up, dw, lf, rt, rot_lf, rot_rt}	t_mv_dir;
 
 typedef struct s_player
 {
-	float x;
-	float y;
-	float angle;
-} t_player;
+	float	x;
+	float	y;
+	float	angle;
+
+}	t_player;
 
 typedef struct s_map
 {
-	int		rows;
-	int		column;
-	uint32_t f_color;
-	uint32_t c_color;
-	mlx_texture_t	*NO;
-	mlx_texture_t	*SO;
-	mlx_texture_t	*WE;
-	mlx_texture_t	*EA;			
-	char	**ar_map;
-} t_map;
+	int				rows;
+	int				column;
+	uint32_t		f_color;
+	uint32_t		c_color;
+	mlx_texture_t	*no;
+	mlx_texture_t	*so;
+	mlx_texture_t	*we;
+	mlx_texture_t	*ea;
+	char			**ar_map;
+}	t_map;
 
 typedef struct s_cub3D
 {
 	mlx_texture_t	*minone;
-	mlx_texture_t	*mintwo;	
-	float view_angle;
-	mlx_t		*mlx;	
-	t_map		*c_map;
-	t_player 	*pl_pos;
-	mlx_image_t *cur_img;
-	char	**tmp_map;
-	mlx_image_t* image;
-} t_cub3d;
-
+	mlx_texture_t	*mintwo;
+		mlx_texture_t	*minthree;
+	float			view_angle;
+	mlx_t			*mlx;
+	t_map			*c_map;
+	t_player		*pl_pos;
+	mlx_image_t		*cur_img;
+	// char			**tmp_map;
+	mlx_image_t		*image;
+	bool			resize;
+}	t_cub3d;
 
 // -----------------------------------------------------------------------------
 
-int32_t ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
+int32_t	ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
 {
-    return (r << 24 | g << 16 | b << 8 | a);
+	return (r << 24 | g << 16 | b << 8 | a);
 }
 
 int	get_color(mlx_texture_t *texture, int x_coord, int y_coord)
 {
-	int byte;
+	int			byte;
 	uint32_t	color;
 
 	byte = (y_coord * texture->width * 4) + (x_coord * 4);
 	color = ft_pixel(texture->pixels[byte], texture->pixels[byte + 1],
-		texture->pixels[byte + 2], texture->pixels[byte + 3]);
+			texture->pixels[byte + 2], texture->pixels[byte + 3]);
 	return (color);
 }
 
-int min(int a, int b)
+int	min(int a, int b)
 {
 	if (a <= b)
-		return a;
-	return b;
+		return (a);
+	return (b);
 }
-int max(int a, int b)
+
+int	max(int a, int b)
 {
 	if (a > b)
-		return a;
-	return b;
-}
-
-void draw_txtr_line(mlx_texture_t *txtr, size_t cl_h, float x1, t_cub3d *s_cub, int i, float y1) // NOT OK
-{
-	int txt_x;
-	int txt_y1;
-	int txt_x1;
-	int32_t y;
-
-	y = 0;
-	while (y < cl_h && y < s_cub->mlx->height )
-	{
-		txt_x = txtr->width * ((float)x1 - (int)x1);
-		if (cl_h > s_cub->mlx->height)
-			txt_y1 = ((cl_h - s_cub->mlx->height)/ 2 + y) 
-			* txtr->height / (cl_h + 0.00001f);
-		else
-			txt_y1 = y * txtr->height / (cl_h + 0.00001f);
-		txt_x1 = txtr->width * ((float)y1 - (int)y1);
-		int clll = min(cl_h, s_cub->mlx->height);
-		int yyy = min(max((int)((s_cub->mlx->height - clll)/2+ y), 0), s_cub->mlx->height);
-		if 	((txtr == s_cub->c_map->NO) || (txtr == s_cub->c_map->SO))
-			mlx_put_pixel(s_cub->image, i, yyy, get_color(txtr, txt_x, (int)txt_y1));
-		if 	((txtr == s_cub->c_map->WE) || (txtr == s_cub->c_map->EA))
-			mlx_put_pixel(s_cub->image, i, yyy, get_color(txtr, txt_x1, txt_y1));
-		++y;
-	}
+		return (a);
+	return (b);
 }
 
 typedef struct s_rcast
 {
-	mlx_texture_t	*wrk_t;
-	float x1;
-	float y1;
-	float ang;
-	float dist;
-} t_raycst;
+	float	x1;
+	float	y1;
+	float	ang;
+	float	dist;
+	size_t	cl_h;
+	int		i;
+}	t_raycst;
 
-void redraw_all(t_cub3d *s_cub) // NOT OK !!!!!!!!!!!!!
+typedef struct s_norm
 {
-	mlx_texture_t	*wrk_txt; // replase
+	int		txt_x;
+	int		txt_y1;
+	int		txt_x1;
+	int32_t	y;
+	int		h;
+	int		n;
+	int32_t	cmh;
+}	t_norm;
 
-	mlx_t* mlx = s_cub->mlx;
-	t_player player = *(s_cub->pl_pos);
-	float view_angle = s_cub->view_angle;
+void	draw_txtr_line(mlx_texture_t *txtr, t_cub3d *s_cub, t_raycst *rt, int i)
+{
+	t_norm	t;
 
-	// floor ceiling start
-	mlx_delete_image(s_cub->mlx, s_cub->image);
-	s_cub->image = mlx_new_image(mlx, mlx->width, mlx->height);
-	for (int32_t i = 0; i < s_cub->mlx->width; ++i)
+	t.cmh = s_cub->mlx->height;
+	t.y = 0;
+	while (t.y < rt->cl_h && t.y < t.cmh)
 	{
-		for (int32_t y = 0; y < s_cub->mlx->height; ++y)
+		t.txt_x = txtr->width * ((float)rt->x1 - (int)rt->x1);
+		if (rt->cl_h > t.cmh)
+			t.txt_y1 = ((rt->cl_h - t.cmh) / 2 + t.y)
+				* txtr->height / (rt->cl_h + 0.00001f);
+		else
+			t.txt_y1 = t.y * txtr->height / (rt->cl_h + 0.00001f);
+		t.txt_x1 = txtr->width * ((float)rt->y1 - (int)rt->y1);
+		t.h = min(rt->cl_h, t.cmh);
+		t.n = min(max((int)((t.cmh - t.h) / 2 + t.y), 0), t.cmh);
+		if ((txtr == s_cub->c_map->no) || (txtr == s_cub->c_map->so))
+			mlx_put_pixel(s_cub->image, i, t.n,
+				get_color(txtr, t.txt_x, t.txt_y1));
+		if ((txtr == s_cub->c_map->we) || (txtr == s_cub->c_map->ea))
+			mlx_put_pixel(s_cub->image, i, t.n,
+				get_color(txtr, t.txt_x1, t.txt_y1));
+		++t.y;
+	}
+}
+
+void	draw_flcl(t_cub3d *s_cub)
+{
+	int	i;
+	int	y;
+
+	i = 0;
+	mlx_delete_image(s_cub->mlx, s_cub->image);
+	s_cub->image = mlx_new_image(s_cub->mlx,
+			s_cub->mlx->width, s_cub->mlx->height);
+	while (i < s_cub->mlx->width)
+	{
+		y = 0;
+		while (y < s_cub->mlx->height)
 		{
-			if (y < s_cub->mlx->height/2)
+			if (y < s_cub->mlx->height / 2)
 				mlx_put_pixel(s_cub->image, i, y, s_cub->c_map->f_color);
 			else
 				mlx_put_pixel(s_cub->image, i, y, s_cub->c_map->c_color);
+			++y;
 		}
+		++i;
 	}
-	// end floor ceiling
-	
-	for (int i = 0; i < mlx->width; i++)
-	{
-		float ang = player.angle - view_angle/2 + (view_angle * i) / mlx->width;
-		for (float dist = 0 ; dist < 20; dist += RTSTEP)
-		{
-			float x1 = player.x + dist * cosf(ang);
-			float y1 = player.y + dist * sinf(ang);
-			if (((int)y1 >= 0) && ((int)y1 < s_cub->c_map->rows) && ((int)x1 >= 0) && ((int)x1 < s_cub->c_map->column ) && (s_cub->tmp_map[(int)y1][(int)x1] != '0'))
-			{
-				size_t column_height = s_cub->mlx->height/(dist*cosf(ang-player.angle));				
-				// start
-				dist -= RTSTEP;
-				x1 = player.x + dist * cosf(ang);
-				y1 = player.y + dist * sinf(ang);
-				if (fabs(x1 -(int)x1) < fabs(1 - x1 + (int)x1) && fabs(x1 -(int)x1) < fabs(1 - y1 + (int)y1) && fabs(x1 -(int)x1) < fabs(y1 - (int)y1))
-					wrk_txt	= s_cub->c_map->WE; // mss
-				if (fabs(1 - x1 + (int)x1) < fabs(x1 -(int)x1) && fabs(1 - x1 + (int)x1) < fabs(1 - y1 + (int)y1) && fabs(1 - x1 + (int)x1) < fabs(y1 - (int)y1))
-					wrk_txt	= s_cub->c_map->EA; // cls	
-				if (fabs(y1 - (int)y1)< fabs(1 - x1 + (int)x1) && fabs(y1 - (int)y1) < fabs(x1 -(int)x1) && fabs(y1 - (int)y1) < fabs(1 - y1 + (int)y1))
-					wrk_txt	= s_cub->c_map->NO; // bls
-				if (fabs(1 - y1 + (int)y1) < fabs(1 - x1 + (int)x1) && fabs(1 - y1 + (int)y1) < fabs(y1 - (int)y1) && fabs(1 - y1 + (int)y1) < fabs(x1 -(int)x1))
-					wrk_txt	= s_cub->c_map->SO; // grs										
-				// end
-				if (s_cub->mintwo == NULL)
-					s_cub->mintwo = wrk_txt;
-				else if (s_cub->minone == NULL)
-					s_cub->minone = wrk_txt;				
-				if (s_cub->mintwo && s_cub->minone)
-				{
-					if ((s_cub->mintwo != s_cub->minone) && (s_cub->mintwo == wrk_txt) && (i > 1))
-					{
-						draw_txtr_line(wrk_txt, column_height, x1, s_cub, i-1, y1);
-						s_cub->minone = wrk_txt;
-					}
-					s_cub->mintwo = s_cub->minone;
-					s_cub->minone = wrk_txt;
-				}
-				draw_txtr_line(wrk_txt, column_height, x1, s_cub, i, y1);
-				break;
-			}
-		}
-	}
-	mlx_image_to_window(mlx, s_cub->image, 0, 0) ;
 }
 
-
-
-int check_wall(t_cub3d *s_cub, float dispX, float dispY)
+mlx_texture_t	*determ_txt(t_cub3d *s_cub, t_raycst *raycst)
 {
-	int newX;
-	int newY;
+	mlx_texture_t	*wrk_txt;
+	float			x1;
+	float			y1;
 
-	newX = (int)(s_cub->pl_pos->x + dispX);
-	newY = (int)(s_cub->pl_pos->y + dispY);		
-	if (s_cub->tmp_map[newY][newX] == '0')
+	raycst->dist -= RTSTEP;
+	x1 = s_cub->pl_pos->x + raycst->dist * cosf(raycst->ang);
+	y1 = s_cub->pl_pos->y + raycst->dist * sinf(raycst->ang);
+	if (fabs(x1 -(int)x1) < fabs(1 - x1 + (int)x1) && fabs(x1 -(int)x1)
+		< fabs(1 - y1 + (int)y1) && fabs(x1 -(int)x1) < fabs(y1 - (int)y1))
+		wrk_txt = s_cub->c_map->we;
+	else if (fabs(1 - x1 + (int)x1) < fabs(x1 -(int)x1) && fabs(1 - x1 + (int)x1)
+		< fabs(1 - y1 + (int)y1) && fabs(1 - x1 + (int)x1) < fabs(y1 - (int)y1))
+		wrk_txt = s_cub->c_map->ea;
+	else if (fabs(y1 - (int)y1) < fabs(1 - x1 + (int)x1) && fabs(y1 - (int)y1)
+		< fabs(x1 - (int)x1) && fabs(y1 - (int)y1) < fabs(1 - y1 + (int)y1))
+		wrk_txt = s_cub->c_map->no;		
+	else if (fabs(1 - y1 + (int)y1) < fabs(1 - x1 + (int)x1)
+		&& fabs(1 - y1 + (int)y1) < fabs(y1 - (int)y1)
+		&& fabs(1 - y1 + (int)y1) < fabs(x1 -(int)x1))
+		wrk_txt = s_cub->c_map->so;
+	return (wrk_txt);
+}
+
+void	fix_artifact(t_cub3d *s_cub, mlx_texture_t *wrk_txt, t_raycst *rt)
+{
+	if (s_cub->minthree== NULL)
+		s_cub->minthree = wrk_txt;	
+	else if (s_cub->mintwo == NULL)
+		s_cub->mintwo = wrk_txt;
+	else if (s_cub->minone == NULL)
+		s_cub->minone = wrk_txt;
+	if (s_cub->mintwo && s_cub->minthree && s_cub->minone)
+	{
+		if ((s_cub->minthree != s_cub->minone)
+			&& (s_cub->minthree == wrk_txt) && (rt->i > 2))
+		{
+			draw_txtr_line(wrk_txt, s_cub, rt, rt->i - 1);
+			draw_txtr_line(wrk_txt, s_cub, rt, rt->i - 2);
+			s_cub->minone = wrk_txt;
+			s_cub->mintwo = wrk_txt;
+		}
+		s_cub->minthree = s_cub->mintwo;
+		s_cub->mintwo = s_cub->minone;
+		s_cub->minone = wrk_txt;
+	}
+}
+
+void	small_preset(t_raycst *rt, t_cub3d *s_cub)
+{
+	rt->ang = s_cub->pl_pos->angle - s_cub->view_angle / 2
+		+ (s_cub->view_angle * rt->i) / s_cub->mlx->width;
+	rt->dist = 0;
+}
+
+void	draw_line(t_raycst *rt, t_cub3d *s_cub)
+{
+	mlx_texture_t	*wrk_txt;
+
+	rt->cl_h = s_cub->mlx->height
+		/ (rt->dist * cosf(rt->ang - s_cub->pl_pos->angle));
+	wrk_txt = determ_txt(s_cub, rt);
+	fix_artifact(s_cub, wrk_txt, rt);
+	draw_txtr_line(wrk_txt, s_cub, rt, rt->i);
+}
+
+void	redraw_all(t_cub3d *s_cub)
+{
+	t_raycst	rt;
+
+	draw_flcl(s_cub);
+	rt.i = 0;
+	while (rt.i < s_cub->mlx->width)
+	{
+		small_preset(&rt, s_cub);
+		while (rt.dist < 20)
+		{
+			rt.x1 = s_cub->pl_pos->x + rt.dist * cosf(rt.ang);
+			rt.y1 = s_cub->pl_pos->y + rt.dist * sinf(rt.ang);
+			if ((rt.y1 >= 0) && (rt.y1 < s_cub->c_map->rows) && (rt.x1 >= 0)
+				&& ((int)rt.x1 < s_cub->c_map->column)
+				&& (s_cub->c_map->ar_map[(int)rt.y1][(int)rt.x1] != '0'))
+			{
+				draw_line(&rt, s_cub);
+				break ;
+			}
+			rt.dist += RTSTEP;
+		}
+		++rt.i;
+	}
+	mlx_image_to_window(s_cub->mlx, s_cub->image, 0, 0);
+}
+
+int	check_wall(t_cub3d *s_cub, float dispX, float dispY)
+{
+	int	new_x;
+	int	new_y;
+
+	new_x = (int)(s_cub->pl_pos->x + dispX*5);
+	new_y = (int)(s_cub->pl_pos->y + dispY*5);
+	if (s_cub->c_map->ar_map[new_y][new_x] == '0')
 		return (1);
 	else
 		return (0);
 }
 
-void move_pl(t_cub3d *s_cub, mv_dir dir) // NOT OK
+void	mv_pl_rt(t_cub3d *s_cub, float dx, float dy)
 {
-	float dx;
-	float dy;
+	if (check_wall(s_cub, -dy, 0))
+		s_cub->pl_pos->x -= dy;
+	if (check_wall(s_cub, 0, +dx))
+		s_cub->pl_pos->y += dx;
+}
+
+void	mv_pl_lf(t_cub3d *s_cub, float dx, float dy)
+{
+	if (check_wall(s_cub, +dy, 0))
+		s_cub->pl_pos->x += dy;
+	if (check_wall(s_cub, 0, -dx))
+		s_cub->pl_pos->y -= dx;
+}
+
+void	mv_pl_up(t_cub3d *s_cub, float dx, float dy)
+{
+	if (check_wall(s_cub, dx, 0))
+		s_cub->pl_pos->x += dx;
+	if (check_wall(s_cub, 0, dy))
+		s_cub->pl_pos->y += dy;
+}
+
+void	move_pl(t_cub3d *s_cub, t_mv_dir dir)
+{
+	float	dx;
+	float	dy;
 
 	dx = STEP * cosf(s_cub->pl_pos->angle);
 	dy = STEP * sinf(s_cub->pl_pos->angle);
-	if (dir == rt) 
-	{
-		if (check_wall(s_cub, -dy, 0))
-			s_cub->pl_pos->x -= dy;
-		if (check_wall(s_cub, 0, +dx))
-			s_cub->pl_pos->y += dx;		
-	}
-	else if (dir == lf)	
-	{
-		if (check_wall(s_cub, +dy, 0)) 
-			s_cub->pl_pos->x += dy;
-		if (check_wall(s_cub, 0, -dx))
-			s_cub->pl_pos->y -= dx;		
-	}
+	if (dir == rt)
+		mv_pl_rt(s_cub, dx, dy);
+	else if (dir == lf)
+		mv_pl_lf(s_cub, dx, dy);
 	else if (dir == up)
-	{
-		if (check_wall(s_cub, dx, 0))		
-			s_cub->pl_pos->x += dx;
-		if (check_wall(s_cub, 0, dy))
-			s_cub->pl_pos->y += dy;	
-	}
+		mv_pl_up(s_cub, dx, dy);
 	else if (dir == dw)
 	{
-		if (check_wall(s_cub, -dx, 0))	
+		if (check_wall(s_cub, -dx, 0))
 			s_cub->pl_pos->x -= dx;
-		if (check_wall(s_cub, 0, -dy))			
-			s_cub->pl_pos->y -= dy;		
+		if (check_wall(s_cub, 0, -dy))
+			s_cub->pl_pos->y -= dy;
 	}
 	else if (dir == rot_lf)
 		s_cub->pl_pos->angle -= TURN_ANGLE;
@@ -259,11 +334,55 @@ void move_pl(t_cub3d *s_cub, mv_dir dir) // NOT OK
 	redraw_all(s_cub);
 }
 
-void ft_key_hook(mlx_key_data_t keydata, void *param)
+// void move_pl(t_cub3d *s_cub, t_mv_dir dir)
+// {
+// 	float dx = STEP * cosf(s_cub->pl_pos->angle);
+// 	float dy = STEP * sinf(s_cub->pl_pos->angle);
+// 	if (dir == rt) 
+// 	{
+// 		if (check_wall(s_cub, -dy, 0) && check_wall(s_cub, 0, +dx))
+// 		{
+// 			s_cub->pl_pos->x -= dy;
+// 			s_cub->pl_pos->y += dx;	
+// 		}	
+// 	}
+// 	else if (dir == lf)	
+// 	{
+// 		if (check_wall(s_cub, +dy, 0) && check_wall(s_cub, 0, -dx)) 
+// 		{
+// 			s_cub->pl_pos->x += dy;
+// 			s_cub->pl_pos->y -= dx;		
+// 		}
+// 	}
+// 	else if (dir == up)
+// 	{
+// 		if (check_wall(s_cub, dx, 0) && check_wall(s_cub, 0, dy*3))	
+// 		{	
+// 			s_cub->pl_pos->x += dx;
+// 			s_cub->pl_pos->y += dy;			
+// 		}
+// 	}
+// 	else if (dir == dw)
+// 	{
+// 		if (check_wall(s_cub, -dx, 0) && check_wall(s_cub, 0, -dy))	
+// 		{
+// 			s_cub->pl_pos->x -= dx;		
+// 			s_cub->pl_pos->y -= dy;		
+// 		}
+// 	}
+// 	else if (dir == rot_lf)
+// 		s_cub->pl_pos->angle -= TURN_ANGLE;
+// 	else if (dir == rot_rt)
+// 		s_cub->pl_pos->angle += TURN_ANGLE;
+// 	redraw_all(s_cub);
+// }
+
+	// mlx_key_hook(main_cub.mlx, ft_key_hook, &main_cub);
+void	ft_key_hook(mlx_key_data_t keydata, void *param)
 {
 	t_cub3d	*s_cub;
 
-	s_cub = (t_cub3d *)param;	
+	s_cub = (t_cub3d *)param;
 	if (keydata.key == MLX_KEY_ESCAPE)
 		mlx_close_window(s_cub->mlx);
 	if (keydata.key == MLX_KEY_W && (keydata.action == MLX_PRESS
@@ -283,31 +402,14 @@ void ft_key_hook(mlx_key_data_t keydata, void *param)
 		move_pl(s_cub, rot_lf);
 	else if (keydata.key == MLX_KEY_RIGHT && (keydata.action == MLX_PRESS
 			|| keydata.action == MLX_REPEAT))
-		move_pl(s_cub, rot_rt);			
+		move_pl(s_cub, rot_rt);
 }
 
-void mlx_resize(int32_t width, int32_t height, void* param)
-{
-	(void)width;
-	(void)height;
-	t_cub3d	*s_cub;
-
-	s_cub = (t_cub3d *)param;	
-
-// resize happen;
-
-	// redraw_all(s_cub);
-	
-	// move_pl(s_cub, dw);
-	// mlx_resize_image(floor0, width, height);
-		// mlx_resize_image(ceiling, width, height);
-}
-
-void ft_hook(void* param)
+void	ft_hook(void *param)
 {
 	t_cub3d	*s_cub;
 
-	s_cub = (t_cub3d *)param;	
+	s_cub = (t_cub3d *)param;
 	if (mlx_is_key_down(s_cub->mlx, MLX_KEY_ESCAPE))
 		mlx_close_window(s_cub->mlx);
 	else if (mlx_is_key_down(s_cub->mlx, MLX_KEY_D))
@@ -326,40 +428,40 @@ void ft_hook(void* param)
 
 // -----------------------------------------------------------------------------
 
-char	**feed_map(char *path) //(t_map *wmap, char *path)
+char	**feed_map(char *path)
 {
 	char **hope;
 	int rowsize = 13;
 	hope = malloc(sizeof(char *) * (rowsize + 1));
 	int i = 0;
 
-    char *filename = path;
-    FILE *fp = fopen(filename, "r");
+	char *filename = path;
+	FILE *fp = fopen(filename, "r");
 
-    if (fp == NULL)
-    {
-        printf("Error: could not open file %s", filename);
-        return 0;
-    }
-    const unsigned MAX_LENGTH = 256;
-    char buffer[MAX_LENGTH];
-    while (fgets(buffer, MAX_LENGTH, fp))
+	if (fp == NULL)
+	{
+		printf("Error: could not open file %s", filename);
+		return 0;
+	}
+	const unsigned MAX_LENGTH = 256;
+	char buffer[MAX_LENGTH];
+	while (fgets(buffer, MAX_LENGTH, fp))
 	{
 		hope[i] = malloc(sizeof(char) * 9);
 		strcpy(hope[i++],buffer);
-        printf("%s", buffer);
+		// printf("%s", buffer);
 	}
 	hope[i] = 0;
-    fclose(fp);
+	fclose(fp);
 	return (hope);
 }
 
-	// system("leaks a.out");
-void	checkleaks(void)
-{
-		system("leaks a.out");
-	// system("leaks so_long");
-}
+
+// void	checkleaks(void)
+// {
+// 	system("leaks a.out");
+// }
+	// atexit(checkleaks);
 
 void	tdimarr_clear(char	**arrclear)
 {
@@ -374,108 +476,50 @@ void	tdimarr_clear(char	**arrclear)
 	free(arrclear);
 }
 
-int32_t main(int32_t argc, char* argv[])	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+int32_t	main(int32_t argc, char* argv[])
 {
-	// atexit(checkleaks);
 	t_cub3d main_cub;
-
-	if (!(main_cub.mlx = mlx_init(WIDTH, HEIGHT, "MLX42", true)))
-	{
-		puts(mlx_strerror(mlx_errno));
-		return(EXIT_FAILURE);
-	}
-
-	char **map;
-	map = feed_map(argv[1]);
-
 	t_map loaded_map_st;
-	// loaded_map_st = load_map(argv[1]);
+	t_player player;	
+	char **map;
+
+	if (argc == 2)
+		map = feed_map(argv[1]);
+	else
+		return (1);
+	main_cub.mlx = mlx_init(WIDTH, HEIGHT, "MLX42", false);
+
 	loaded_map_st.ar_map = map;
-	loaded_map_st.EA = mlx_load_png("imgs/cls.png");
-	loaded_map_st.NO = mlx_load_png("imgs/bls.png");
-	loaded_map_st.SO = mlx_load_png("imgs/grs.png");
-	loaded_map_st.WE = mlx_load_png("imgs/mss.png");
+	loaded_map_st.ea = mlx_load_png("imgs/cls.png");
+	loaded_map_st.no = mlx_load_png("imgs/bls.png");
+	loaded_map_st.so = mlx_load_png("imgs/grs.png");
+	loaded_map_st.we = mlx_load_png("imgs/mss.png");
 	loaded_map_st.f_color = ft_pixel(255, 0, 0, 255);
 	loaded_map_st.c_color = ft_pixel(116, 96, 31, 255);
 	loaded_map_st.column = 7;
 	loaded_map_st.rows = 13;
-	
-	t_player player;
+
 	player.x = 2.5f;
 	player.y = 5.4f;
 	player.angle = 1.5*M_PI;
 
-	main_cub.tmp_map = map;
 	main_cub.pl_pos = &player;
 	main_cub.view_angle = M_PI/3;
 	main_cub.c_map = &loaded_map_st;
 	main_cub.minone = NULL;
 	main_cub.mintwo = NULL;
+	main_cub.minthree = NULL;
 	main_cub.image = mlx_new_image(main_cub.mlx, main_cub.mlx->width, main_cub.mlx->height);
 
 	redraw_all(&main_cub);
-
-	// mlx_loop_hook(mlx, ft_randomize, mlx);
 	mlx_loop_hook(main_cub.mlx, ft_hook, &main_cub);
-	// mlx_key_hook(main_cub.mlx, ft_key_hook, &main_cub);
-	// mlx_resize_hook(main_cub.mlx, mlx_resize, &main_cub);
 	mlx_loop(main_cub.mlx);
 	mlx_terminate(main_cub.mlx);
 
-mlx_delete_texture(loaded_map_st.EA);
-mlx_delete_texture(loaded_map_st.NO);
-mlx_delete_texture(loaded_map_st.SO);
-mlx_delete_texture(loaded_map_st.WE);
-tdimarr_clear(loaded_map_st.ar_map);
-
-	return (EXIT_SUCCESS);
+	mlx_delete_texture(loaded_map_st.ea);
+	mlx_delete_texture(loaded_map_st.no);
+	mlx_delete_texture(loaded_map_st.so);
+	mlx_delete_texture(loaded_map_st.we);
+	tdimarr_clear(loaded_map_st.ar_map);
+	return (0);
 }
-
-// void move_pl(t_cub3d *s_cub, mv_dir dir)
-// {
-// 	float dx = STEP * cosf(s_cub->pl_pos->angle);
-// 	float dy = STEP * sinf(s_cub->pl_pos->angle);
-// 	if (dir == rt) 
-// 	{
-// 		if (check_wall(s_cub, -dy, 0) && check_wall(s_cub, 0, +dx))
-// 		{
-
-// 			s_cub->pl_pos->x -= dy;
-// 		// if (check_wall(s_cub, 0, +dx))
-// 			s_cub->pl_pos->y += dx;	
-// 		}	
-// 	}
-// 	else if (dir == lf)	
-// 	{
-// 		if (check_wall(s_cub, +dy, 0) && check_wall(s_cub, 0, -dx)) 
-// 		{
-// 			s_cub->pl_pos->x += dy;
-// 		// if (check_wall(s_cub, 0, -dx))
-// 			s_cub->pl_pos->y -= dx;		
-// 		}
-// 	}
-// 	else if (dir == up)
-// 	{
-// 		if (check_wall(s_cub, dx, 0) && check_wall(s_cub, 0, dy*3))	
-// 		{	
-// 			s_cub->pl_pos->x += dx;
-// 		// if (check_wall(s_cub, 0, dy))
-// 			s_cub->pl_pos->y += dy;	
-// 			printf("dx=%f, dy=%f\n", s_cub->pl_pos->x, s_cub->pl_pos->y);			
-// 		}
-// 	}
-// 	else if (dir == dw)
-// 	{
-// 		if (check_wall(s_cub, -dx, 0) && check_wall(s_cub, 0, -dy))	
-// 		{
-// 			s_cub->pl_pos->x -= dx;
-// 		// if (check_wall(s_cub, 0, -dy))			
-// 			s_cub->pl_pos->y -= dy;		
-// 		}
-// 	}
-// 	else if (dir == rot_lf)
-// 		s_cub->pl_pos->angle -= TURN_ANGLE;
-// 	else if (dir == rot_rt)
-// 		s_cub->pl_pos->angle += TURN_ANGLE;
-// 	redraw_all(s_cub);
-// }
