@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/14 17:30:49 by inovomli         ###   ########.fr       */
+/*   Updated: 2023/04/20 16:02:49 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,62 +17,25 @@
 // "$(brew --prefix glfw)/lib/" -pthread -lm -L../LeakSanitizer -llsan -lc++  
 // -Wno-gnu-include-next -I ../LeakSanitizer/include
 
-#include <unistd.h>
-#include <stdio.h>
+#include "cub3d.h"
 
-#include <fcntl.h>
-#include <math.h>
-#include <string.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include "MLX42/include/MLX42/MLX42.h"
-
-#define WIDTH 512
-#define HEIGHT 512
-#define STEP 0.09f
-#define TURN_ANGLE 0.05f
-#define RTSTEP 0.001f
-
-typedef enum e_mv_dir{not_set = 0, up, dw, lf, rt, rot_lf, rot_rt}	t_mv_dir;
-
-typedef struct s_player
+void	print_arg(char **args)
 {
-	float	x;
-	float	y;
-	float	angle;
+	int	i;
 
-}	t_player;
-
-typedef struct s_map
-{
-	int				rows;
-	int				column;
-	uint32_t		f_color;
-	uint32_t		c_color;
-	mlx_texture_t	*no;
-	mlx_texture_t	*so;
-	mlx_texture_t	*we;
-	mlx_texture_t	*ea;
-	char			**ar_map;
-}	t_map;
-
-typedef struct s_cub3D
-{
-	mlx_texture_t	*minone;
-	mlx_texture_t	*mintwo;
-	mlx_texture_t	*minthree;
-	float			view_angle;
-	mlx_t			*mlx;
-	t_map			*c_map;
-	t_player		*pl_pos;
-	mlx_image_t		*cur_img;
-	mlx_image_t		*image;
-	bool			resize;
-}	t_cub3d;
-
-// -----------------------------------------------------------------------------
+	i = 0;
+	if (args)
+	{
+		while (args[i])
+		{
+			printf("%s", args[i]);
+			i++;
+		}
+		printf("\n");
+	}
+	else
+		printf("args: (null)\n");
+}
 
 int32_t	ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
 {
@@ -103,27 +66,6 @@ int	max(int a, int b)
 		return (a);
 	return (b);
 }
-
-typedef struct s_rcast
-{
-	float	x1;
-	float	y1;
-	float	ang;
-	float	dist;
-	size_t	cl_h;
-	int		i;
-}	t_raycst;
-
-typedef struct s_norm
-{
-	int		txt_x;
-	int		txt_y1;
-	int		txt_x1;
-	int32_t	y;
-	int		h;
-	int		n;
-	int32_t	cmh;
-}	t_norm;
 
 void	draw_txtr_line(mlx_texture_t *txtr, t_cub3d *s_cub, t_raycst *rt, int i)
 {
@@ -461,7 +403,7 @@ void	ft_hook(void *param)
 // {
 // 	system("leaks a.out");
 // }
-	// atexit(checkleaks);
+// 	atexit(checkleaks);
 
 void	tdimarr_clear(char	**arrclear)
 {
@@ -479,25 +421,23 @@ void	tdimarr_clear(char	**arrclear)
 int32_t	main(int32_t argc, char *argv[])
 {
 	t_cub3d		m_cub;
-	t_map		loaded_map_st;
+	// t_map		loaded_map_st;
 	t_player	player;
-	char		**map;
+	// char		**map;
 
-	if (argc == 2)
-		map = feed_map(argv[1]);
-	else
-		return (1);
+	// if (argc == 2)
+	// 	map = feed_map(argv[1]);
+	// else
+	// 	return (1);
+	
 	m_cub.mlx = mlx_init(WIDTH, HEIGHT, "MLX42", false);
-
-	loaded_map_st.ar_map = map;
-	loaded_map_st.ea = mlx_load_png("imgs/cls.png");
-	loaded_map_st.no = mlx_load_png("imgs/bls.png");
-	loaded_map_st.so = mlx_load_png("imgs/grs.png");
-	loaded_map_st.we = mlx_load_png("imgs/mss.png");
-	loaded_map_st.f_color = ft_pixel(255, 0, 0, 255);
-	loaded_map_st.c_color = ft_pixel(116, 96, 31, 255);
-	loaded_map_st.column = 7;
-	loaded_map_st.rows = 13;
+	read_file(&m_cub, argv);
+	m_cub.c_map->ea = mlx_load_png(m_cub.c_map->east_path);
+	m_cub.c_map->no = mlx_load_png(m_cub.c_map->north_path);
+	m_cub.c_map->so = mlx_load_png(m_cub.c_map->south_path);
+	m_cub.c_map->we = mlx_load_png(m_cub.c_map->west_path);
+	m_cub.c_map->f_color = ft_pixel(m_cub.c_map->f_color_r, m_cub.c_map->f_color_g, m_cub.c_map->f_color_b, 255);
+	m_cub.c_map->c_color = ft_pixel(m_cub.c_map->c_color_r, m_cub.c_map->c_color_g, m_cub.c_map->c_color_b, 255);
 
 	player.x = 2.5f;
 	player.y = 5.4f;
@@ -505,7 +445,6 @@ int32_t	main(int32_t argc, char *argv[])
 
 	m_cub.pl_pos = &player;
 	m_cub.view_angle = M_PI / 3;
-	m_cub.c_map = &loaded_map_st;
 	m_cub.minone = NULL;
 	m_cub.mintwo = NULL;
 	m_cub.minthree = NULL;
@@ -516,10 +455,10 @@ int32_t	main(int32_t argc, char *argv[])
 	mlx_loop(m_cub.mlx);
 	mlx_terminate(m_cub.mlx);
 
-	mlx_delete_texture(loaded_map_st.ea);
-	mlx_delete_texture(loaded_map_st.no);
-	mlx_delete_texture(loaded_map_st.so);
-	mlx_delete_texture(loaded_map_st.we);
-	tdimarr_clear(loaded_map_st.ar_map);
+	mlx_delete_texture(m_cub.c_map->ea);
+	mlx_delete_texture(m_cub.c_map->no);
+	mlx_delete_texture(m_cub.c_map->so);
+	mlx_delete_texture(m_cub.c_map->we);
+	tdimarr_clear(m_cub.c_map->ar_map);
 	return (0);
 }
