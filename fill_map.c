@@ -5,54 +5,45 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/04/09 18:19:11 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/20 15:14:53 by ccompote         ###   ########.fr       */
+/*   Created: 2023/04/20 16:35:10 by ccompote          #+#    #+#             */
+/*   Updated: 2023/04/20 17:26:04 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+
+
 #include "cub3d.h"
 
-// void	fillin(t_cub *zop, mlx_image_t *image, int i, int j)
-// {
-// 	mlx_image_to_window(zop->mlx, zop->floor_image, j * STEP, i * STEP);
-// 	mlx_image_to_window(zop->mlx, image, j * STEP, i * STEP);
-// 	if (zop->map[i][j] == 'C')
-// 		zop->points_begin++;
-// 	if (zop->map[i][j] == 'E')
-// 	{
-// 		zop->door_x = j;
-// 		zop->door_y = i;
-// 	}
-// }
+void	find_player(t_cub3d *main_cub)
+{
+	int	i;
+	int	j;
 
-// int	fill_images(t_cub3d *zop, int x, int y)
-// {
-// 	int	i;
-// 	int	j;
+	i = -1;
+	while (main_cub->c_map->ar_map[++i])
+	{
+		j = -1;
 
-// 	i = -1;
-// 	while (zop->map[++i])
-// 	{
-// 		j = -1;
-// 		while (zop->map[i][++j] != '\n' && zop->map[i][j])
-// 		{
-// 			if (zop->map[i][j] == '1')
-// 				fillin(zop, zop->tree_image, i, j);
-// 			else if (zop->map[i][j] == 'C')
-// 				fillin(zop, zop->mushroom_image, i, j);
-// 			else if (zop->map[i][j] == 'E')
-// 				fillin(zop, zop->door_close_image, i, j);
-// 			else if (zop->map[i][j] == '0')
-// 				mlx_image_to_window(zop->mlx, zop->floor_image,
-// 					j * STEP, i * STEP);
-// 			else if (zop->map[i][j] == 'P')
-// 				fillin(zop, zop->rat_image, y, x);
-// 			else
-// 				return (0);
-// 		}
-// 	}
-// 	return (1);
-// }
+		while (main_cub->c_map->ar_map[i][++j] != '\n' && main_cub->c_map->ar_map[i][j])
+		{
+			if (main_cub->c_map->ar_map[i][j] == 'N' || main_cub->c_map->ar_map[i][j] == 'S' || main_cub->c_map->ar_map[i][j] == 'W' || main_cub->c_map->ar_map[i][j] == 'E')
+			{
+				main_cub->pl_pos = ft_calloc(1, sizeof(t_player));
+				main_cub->pl_pos->x = j + 0.5f;
+				main_cub->pl_pos->y = i + 0.5f;
+				if (main_cub->c_map->ar_map[i][j] == 'N')
+					main_cub->pl_pos->angle = 1.5 * M_PI;
+				else if (main_cub->c_map->ar_map[i][j] == 'S')
+					main_cub->pl_pos->angle = 0.5 * M_PI;
+				else if (main_cub->c_map->ar_map[i][j] == 'W')
+					main_cub->pl_pos->angle = 0;
+				else if (main_cub->c_map->ar_map[i][j] == 'E')
+					main_cub->pl_pos->angle = 1 * M_PI;
+				main_cub->c_map->ar_map[i][j] = '0';
+			}
+		}
+	}
+}
 
 //карту дополнить до квадрата
-//найти игрока и потом поставить вместо его 0
+// менять размер окна

@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 15:54:34 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/20 15:55:08 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/20 17:49:48 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ int		ft_strlen_no_nl(char *s);
 int		check_arg(int argc, char **argv);
 int		checker_2(t_cub3d *zop, char **argv);
 int		map_lines(int fd, t_cub3d *zop);
-
+void	find_player(t_cub3d *main_cub);
 
 void	print_arg(char **args);
 

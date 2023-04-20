@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/20 16:02:49 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/20 17:01:13 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -421,10 +421,6 @@ void	tdimarr_clear(char	**arrclear)
 int32_t	main(int32_t argc, char *argv[])
 {
 	t_cub3d		m_cub;
-	// t_map		loaded_map_st;
-	t_player	player;
-	// char		**map;
-
 	// if (argc == 2)
 	// 	map = feed_map(argv[1]);
 	// else
@@ -438,12 +434,6 @@ int32_t	main(int32_t argc, char *argv[])
 	m_cub.c_map->we = mlx_load_png(m_cub.c_map->west_path);
 	m_cub.c_map->f_color = ft_pixel(m_cub.c_map->f_color_r, m_cub.c_map->f_color_g, m_cub.c_map->f_color_b, 255);
 	m_cub.c_map->c_color = ft_pixel(m_cub.c_map->c_color_r, m_cub.c_map->c_color_g, m_cub.c_map->c_color_b, 255);
-
-	player.x = 2.5f;
-	player.y = 5.4f;
-	player.angle = 1.5 * M_PI;
-
-	m_cub.pl_pos = &player;
 	m_cub.view_angle = M_PI / 3;
 	m_cub.minone = NULL;
 	m_cub.mintwo = NULL;
