@@ -56,4 +56,4 @@ dkms.conf
 cub3d
 a.out
 .DS_Store
-./.vscode
+.vscode

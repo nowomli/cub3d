@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 16:00:08 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/20 20:15:42 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/21 16:17:55 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,6 +244,7 @@ void	create_map(t_cub3d *main_cub)
 	while (i < main_cub->c_map->rows)
 	{
 		main_cub->c_map->ar_map[i] = ft_strdup(main_cub->map_file[j]);
+		// printf("%s", main_cub->c_map->ar_map[i]);
 		i++;
 		j++;
 	}
@@ -299,44 +300,68 @@ void	rect_map(t_cub3d *main_cub)
 
 	i = 0;
 	new_map = ft_calloc(main_cub->c_map->rows + 1, sizeof(char *));
-	while (main_cub->c_map->ar_map[i])
+
+	// while (main_cub->c_map->ar_map[i])
+	// {
+	// 	if (ft_strlen_no_nl(main_cub->c_map->ar_map[i]) != main_cub->c_map->column)
+	// 	{
+	// 		j = 0;
+	// 		k = 0;
+	// 		// printf("%d column\n", main_cub->c_map->column);
+	// 		new_map[i] = ft_calloc((main_cub->c_map->column + 1), sizeof(char));
+	// 		while (j <= main_cub->c_map->column)
+	// 		{
+	// 			if (main_cub->c_map->ar_map[i][k] == '\n' && new_map[i])
+	// 			{
+	// 				new_map[i][j] = '1';
+	// 			}
+	// 			else if (main_cub->c_map->ar_map[i][k] == ' ')
+	// 			{
+	// 				new_map[i][j] = '1';
+	// 				k++;
+	// 			}
+	// 			else
+	// 			{
+	// 				new_map[i][j] = main_cub->c_map->ar_map[i][k];
+	// 				k++;
+	// 			}
+	// 			j++;
+	// 		}
+	// 		// printf("%d j\n", j);
+	// 		new_map[i][j] = '\0';
+	// 	}
+	// 	else
+	// 		new_map[i] = ft_strdup(main_cub->c_map->ar_map[i]);
+	// 	// printf("%d\n", ft_strlen(new_map[i]));
+	// 	printf("%s\n", new_map[i]);
+	// 	i++;
+	// }
+	// new_map[i] = NULL;
+	// print_arg(new_map);
+	while (i < main_cub->c_map->rows)
 	{
-		if (ft_strlen_no_nl(main_cub->c_map->ar_map[i]) != main_cub->c_map->column)
+		j = 0;
+		k = 0;
+		// printf("i%i\n", i);
+		new_map[i] = ft_calloc((main_cub->c_map->column + 1), sizeof(char));
+		while (j < main_cub->c_map->column)
 		{
-			j = 0;
-			k = 0;
-			printf("%d column\n", main_cub->c_map->column);
-			new_map[i] = ft_calloc((main_cub->c_map->column + 1), sizeof(char));
-			while (j < main_cub->c_map->column)
+			// printf("j%i\n", j);
+			if (main_cub->c_map->ar_map[i][j]
+				&& (ft_isdigit(main_cub->c_map->ar_map[i][j])
+				|| ft_strchr("NSEW", main_cub->c_map->ar_map[i][j]))
+				&& (j <= ft_strlen(main_cub->c_map->ar_map[i])))
+				new_map[i][j] = main_cub->c_map->ar_map[i][j];
+			else
 			{
-				if (main_cub->c_map->ar_map[i][k] == '\n' && new_map[i])
-				{
-					new_map[i][j] = '1';
-				}
-				else if (main_cub->c_map->ar_map[i][k] == ' ')
-				{
-					new_map[i][j] = '1';
-					k++;
-				}
-				else
-				{
-					new_map[i][j] = main_cub->c_map->ar_map[i][k];
-					k++;
-				}
-				j++;
+				new_map[i][j] = '1';
 			}
-			printf("%d j\n", j);
-			new_map[i][j] = '\n';
+			j++;
 		}
-		else
-			new_map[i] = ft_strdup(main_cub->c_map->ar_map[i]);
-		printf("%d\n", ft_strlen(new_map[i]));
+			new_map[i][main_cub->c_map->column] = '\0';
 		printf("%s\n", new_map[i]);
 		i++;
 	}
-	// new_map[i] = NULL;
-	// print_arg(new_map);
-	
 	main_cub->c_map->ar_map = new_map;
 }
 
@@ -353,7 +378,7 @@ int	read_file(t_cub3d *main_cub, char **argv)
 	create_images(main_cub);
 	create_colors(main_cub);
 	create_map(main_cub);
-	// rect_map(main_cub);
+	rect_map(main_cub);
 	find_player(main_cub);
 	close(fd);
 	// if (checker_2(main_cub, argv))
