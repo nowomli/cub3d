@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/20 17:01:13 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/22 15:17:10 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ void	print_arg(char **args)
 		while (args[i])
 		{
 			printf("%s", args[i]);
+			printf("\n");
 			i++;
 		}
-		printf("\n");
 	}
 	else
 		printf("args: (null)\n");
@@ -421,13 +421,12 @@ void	tdimarr_clear(char	**arrclear)
 int32_t	main(int32_t argc, char *argv[])
 {
 	t_cub3d		m_cub;
-	// if (argc == 2)
-	// 	map = feed_map(argv[1]);
-	// else
-	// 	return (1);
 	
 	m_cub.mlx = mlx_init(WIDTH, HEIGHT, "MLX42", false);
-	read_file(&m_cub, argv);
+	if (argc == 2)
+		read_file(&m_cub, argv);
+	else
+		return (1);
 	m_cub.c_map->ea = mlx_load_png(m_cub.c_map->east_path);
 	m_cub.c_map->no = mlx_load_png(m_cub.c_map->north_path);
 	m_cub.c_map->so = mlx_load_png(m_cub.c_map->south_path);
@@ -439,12 +438,10 @@ int32_t	main(int32_t argc, char *argv[])
 	m_cub.mintwo = NULL;
 	m_cub.minthree = NULL;
 	m_cub.image = mlx_new_image(m_cub.mlx, m_cub.mlx->width, m_cub.mlx->height);
-
 	redraw_all(&m_cub);
 	mlx_loop_hook(m_cub.mlx, ft_hook, &m_cub);
 	mlx_loop(m_cub.mlx);
 	mlx_terminate(m_cub.mlx);
-
 	mlx_delete_texture(m_cub.c_map->ea);
 	mlx_delete_texture(m_cub.c_map->no);
 	mlx_delete_texture(m_cub.c_map->so);
