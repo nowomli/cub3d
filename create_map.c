@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 16:00:08 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/23 18:36:22 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/23 23:09:35 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,69 +34,83 @@ int	file_lines(int fd, t_cub3d *main_cub)
 	return (1);
 }
 
-// int	create_images(t_map *c_map, char *line)
-// {
-// 	char	*tmp;
-// 	int		i;
-// 	int 	j;
+int	create_images(t_map *c_map, char *line)
+{
+	char	*tmp;
+	int		i;
+	int 	line_len;
 
-
-// 	j = 0;
-// 	if (!ft_strncmp(line[j], "NO", 2))
-// 	{
-// 		tmp = ft_calloc((ft_strlen(line[j]) - 1 - 3), sizeof(char));
-// 		line[j] += 3;
-// 		while (i < (ft_strlen(line[j]) - 1))
-// 		{
-// 			tmp[j] = line[j];
-// 			i++;
-// 		}
-// 		tmp[j] = '\0';
-// 		c_map->north_path = ft_strdup(tmp);
-// 		free(tmp);
-// 	}
-// 	else if (!ft_strncmp(line[j], "SO", 2))
-// 	{
-// 		tmp = ft_calloc((ft_strlen(line[j]) - 1 - 3), sizeof(char));
-// 		line[j] += 3;
-// 		while (i < (ft_strlen(line[j]) - 1))
-// 		{
-// 			tmp[j] = line[j];
-// 			i++;
-// 		}
-// 		tmp[j] = '\0';
-// 		c_map->south_path = ft_strdup(tmp);
-// 		free(tmp);
-// 	}
-// 	else if (!ft_strncmp(line[j], "WE", 2))
-// 	{
-// 		tmp = ft_calloc((ft_strlen(line[j]) - 1 - 3), sizeof(char));
-// 		line[j] += 3;
-// 		while (i < (ft_strlen(line[j]) - 1))
-// 		{
-// 			tmp[j] = line[j];
-// 			i++;
-// 		}
-// 		tmp[j] = '\0';
-// 		c_map->west_path = ft_strdup(tmp);
-// 		free(tmp);
-// 	}
-// 	else if (!ft_strncmp(line[j], "EA", 2))
-// 	{
-// 		tmp = ft_calloc((ft_strlen(line[j]) - 1 - 3), sizeof(char));
-// 		line[j] += 3;
-// 		while (i < (ft_strlen(line[j]) - 1))
-// 		{
-// 			tmp[j] = line[j];
-// 			i++;
-// 		}
-// 		tmp[j] = '\0';
-// 		c_map->east_path = ft_strdup(tmp);
-// 		free(tmp);
-// 	}
-// 	j++;
-// 	return (0);
-// }
+	i = 0;
+	if (!ft_strncmp(line, "NO ", 3))
+	{
+		line += 3;
+		while (*line == ' ' || *line == '\n')
+			line++;
+		line_len = ft_strlen(line);
+		tmp = ft_calloc((ft_strlen(line) - 1), sizeof(char));
+		while (i < (line_len - 1))
+		{
+			tmp[i] = *line;
+			i++;
+			line++;
+		}
+		tmp[i] = '\0';
+		c_map->north_path = ft_strdup(tmp);
+		free(tmp);
+	}
+	else if (!ft_strncmp(line, "SO ", 3))
+	{
+		line += 3;
+		while (*line == ' ' || *line == '\n')
+			line++;
+		line_len = ft_strlen(line);
+		tmp = ft_calloc((ft_strlen(line) - 1), sizeof(char));
+		while (i < (line_len - 1))
+		{
+			tmp[i] = *line;
+			i++;
+			line++;
+		}
+		tmp[i] = '\0';
+		c_map->south_path = ft_strdup(tmp);
+		free(tmp);
+	}
+	else if (!ft_strncmp(line, "WE ", 3))
+	{
+		line += 3;
+		while (*line == ' ' || *line == '\n')
+			line++;
+		line_len = ft_strlen(line);
+		tmp = ft_calloc((ft_strlen(line) - 1), sizeof(char));
+		while (i < (line_len - 1))
+		{
+			tmp[i] = *line;
+			i++;
+			line++;
+		}
+		tmp[i] = '\0';
+		c_map->west_path = ft_strdup(tmp);
+		free(tmp);
+	}
+	else if (!ft_strncmp(line, "EA ", 3))
+	{
+		line += 3;
+		while (*line == ' ' || *line == '\n')
+			line++;
+		line_len = ft_strlen(line);
+		tmp = ft_calloc((ft_strlen(line) - 1), sizeof(char));
+		while (i < (line_len - 1))
+		{
+			tmp[i] = *line;
+			i++;
+			line++;
+		}
+		tmp[i] = '\0';
+		c_map->east_path = ft_strdup(tmp);
+		free(tmp);
+	}
+	return (0);
+}
 
 // void	create_colors(t_cub3d *main_cub)
 // {
@@ -191,13 +205,13 @@ void	create_file_arr(int fd, t_cub3d *main_cub)
 	main_cub->map_file[i] = NULL;
 }
 
-void	create_map(t_cub3d *main_cub)
+void	create_map(t_cub3d *main_cub, int inx)
 {
 	int	j;
 	int i;
 	char	*tmp;
 
-	j = 8;
+	j = inx;
 	i = 0;
 	main_cub->c_map->rows = 0;
 	main_cub->c_map->column = 0;
@@ -209,7 +223,7 @@ void	create_map(t_cub3d *main_cub)
 		main_cub->c_map->rows++;
 	}
 	main_cub->c_map->ar_map = ft_calloc(main_cub->c_map->rows + 1, sizeof(char *));
-	j = 8;
+	j = inx;
 	while (i < main_cub->c_map->rows)
 	{
 		main_cub->c_map->ar_map[i] = ft_strdup(main_cub->map_file[j]);
@@ -217,6 +231,7 @@ void	create_map(t_cub3d *main_cub)
 		j++;
 	}
 	main_cub->c_map->ar_map[i] = NULL;
+	
 }
 
 void	rect_map(t_map *c_map)
@@ -247,7 +262,7 @@ void	rect_map(t_map *c_map)
 	}
 	new_map[i] = NULL;
 	c_map->ar_map = new_map;
-	print_arg(c_map->ar_map);
+	// print_arg(c_map->ar_map);
 }
 
 void	color_floor(t_map *c_map, int inx, char *tmp)
@@ -267,7 +282,11 @@ void	color_ceiling(t_map *c_map, int inx, char *tmp)
 	else if (inx == 1)
 		c_map->c_color_g = ft_atoi(tmp);
 	else if (inx == 2)
+	{
+		printf("%s here\n", tmp);
 		c_map->c_color_b = ft_atoi(tmp);
+		printf("%d is\n", c_map->c_color_b);
+	}
 }
 
 void	create_colors(t_map *c_map, char *line, char c)
@@ -293,14 +312,14 @@ void	create_colors(t_map *c_map, char *line, char c)
 		}
 		if (c == 'F')
 			color_floor(c_map, inx, tmp);
-		else
+		else if (c == 'C')
 			color_ceiling(c_map, inx, tmp);
 		line++;
 		inx++;
 	}
 }
 
-void	parse_map(t_cub3d *main_cub)
+void	parse_file(t_cub3d *main_cub)
 {
 	int	i;
 	int	j;
@@ -311,35 +330,50 @@ void	parse_map(t_cub3d *main_cub)
 	while (i < main_cub->file_rows)
 	{
 		j = 0;
+		while (main_cub->map_file[i][j] == ' ' || main_cub->map_file[i][j] == '\t')
+			main_cub->map_file[i]++;
 		if (main_cub->map_file[i][j] == '\n')
 			i++;
 		else if (main_cub->map_file[i][j] == 'F')
 		{
 			main_cub->map_file[i] += 2;
+			while (main_cub->map_file[i][j] == ' ' || main_cub->map_file[i][j] == '\t')
+				main_cub->map_file[i]++;
 			create_colors(main_cub->c_map, main_cub->map_file[i], 'F');
 			i++;
-			found++:
+			found++;
 		}
 		else if (main_cub->map_file[i][j] == 'C')
 		{
 			main_cub->map_file[i] += 2;
+			while (main_cub->map_file[i][j] == ' ' || main_cub->map_file[i][j] == '\t')
+				main_cub->map_file[i]++;
 			create_colors(main_cub->c_map, main_cub->map_file[i], 'C');
 			i++;
 			found++;
 		}
-		else if (!ft_strncmp(main_cub->map_file[i], "NO", 2)
-			|| !ft_strncmp(main_cub->map_file[j], "SO", 2)
-			|| !ft_strncmp(main_cub->map_file[j], "WE", 2)
-			|| !ft_strncmp(main_cub->map_file[j], "EA", 2))
+		else if (!ft_strncmp(main_cub->map_file[i], "NO ", 3)
+			|| !ft_strncmp(main_cub->map_file[i], "SO ", 3)
+			|| !ft_strncmp(main_cub->map_file[i], "WE ", 3)
+			|| !ft_strncmp(main_cub->map_file[i], "EA ", 3))
 		{
+			while (main_cub->map_file[i][j] == ' ' || main_cub->map_file[i][j] == '\t')
+				main_cub->map_file[i]++;
 			create_images(main_cub->c_map, main_cub->map_file[i]);
 			i++;
 			found++;
 		}
-		
-		
+		else if (found == 6)
+		{
+			create_map(main_cub, i);
+			break ;
+		}
+		else
+		{
+			printf("wrong\n");
+			return ;
+		}
 	}
-
 }
 
 int	read_file(t_cub3d *main_cub, char **argv)
@@ -352,18 +386,14 @@ int	read_file(t_cub3d *main_cub, char **argv)
 	close(fd);
 	fd = open(argv[1], O_RDONLY);
 	create_file_arr(fd, main_cub);
-
-	
-	
-	find_images(main_cub);
-	
-	find_colors(main_cub);
-	
-	find_map(main_cub);
-	
+	parse_file(main_cub);
 	find_player(main_cub);
-	
 	rect_map(main_cub->c_map);
+	// print_arg(main_cub->c_map->ar_map);
+	// printf("\n");
+	printf("%d %d %d f\n", main_cub->c_map->f_color_r, main_cub->c_map->f_color_g, main_cub->c_map->f_color_b);
+	printf("%d %d %d c\n", main_cub->c_map->c_color_r, main_cub->c_map->c_color_g, main_cub->c_map->c_color_b);
+	// printf("\n");
 	close(fd);
 	// if (checker_2(main_cub, argv))
 	// 	return (0);
