@@ -6,7 +6,7 @@
 #    By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/16 11:49:23 by ccompote          #+#    #+#              #
-#    Updated: 2023/04/20 16:37:31 by ccompote         ###   ########.fr        #
+#    Updated: 2023/04/23 18:00:08 by ccompote         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,21 +14,30 @@ CC = gcc
 SRCS = main.c get_next_line.c get_next_line_utils.c create_map.c check_before_map.c fill_map.c 
 
 NAME =  cub3d
-OBJ	= $(SRCS:.c=.o)
+OBJ_DIR = ./obj/
+OBJ_FILES = $(patsubst %.c, %.o, $(SRCS))
+OBJ	= $(addprefix $(OBJ_DIR), $(OBJ_FILES))
 # CFLAGS = -Wall -Werror -Wextra
 LIBFT = ./libft
 MLX42 = ./MLX42
+SRCS_DIR = ./
 
-all: libft MLX42 $(NAME)
+$(OBJ_DIR)%.o:$(SRCS_DIR)%.c
+	$(CC) -c $< -o $@
+
+all: obj libft MLX42 $(NAME)
+
+obj: 
+	mkdir -p $(OBJ_DIR)
+
+$(NAME): $(OBJ)
+	$(CC) $(OBJ) MLX42/build/libmlx42.a $(LIBFT)/libft.a -Iinclude -ldl -lglfw -L "$(shell brew --prefix glfw)/lib/" -pthread -lm -o $(NAME) 
 
 libft:
 	@$(MAKE) -C $(LIBFT)
 
 # MLX42:
 # 	@$(MAKE) -C $(MLX42)
-
-$(NAME): $(OBJ)
-	$(CC) $(OBJ) MLX42/build/libmlx42.a $(LIBFT)/libft.a -Iinclude -ldl -lglfw -L "$(shell brew --prefix glfw)/lib/" -pthread -lm -o $(NAME)
 
 clean:
 	rm -f $(OBJ)
@@ -38,7 +47,7 @@ clean:
 fclean: clean
 	rm -f $(NAME)
 	@$(MAKE) -C $(LIBFT) fclean
-	@$(MAKE) -C $(MLX42) fclean
+	# @$(MAKE) -C $(MLX42) fclean
 
 re: fclean all
 
