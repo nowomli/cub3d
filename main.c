@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/23 22:56:23 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/24 12:16:05 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -424,7 +424,10 @@ int32_t	main(int32_t argc, char *argv[])
 	
 	m_cub.mlx = mlx_init(WIDTH, HEIGHT, "MLX42", false);
 	if (argc == 2)
-		read_file(&m_cub, argv);
+	{
+		if (!read_file(&m_cub, argv))
+			return (1);
+	}
 	else
 		return (1);
 	m_cub.c_map->ea = mlx_load_png(m_cub.c_map->east_path);

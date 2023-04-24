@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 15:54:34 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/23 18:34:51 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/24 13:05:54 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ typedef struct s_cub3D
 	bool			resize;
 } t_cub3d;
 
-int	read_file(t_cub3d *zop, char **argv);
+int		read_file(t_cub3d *zop, char **argv);
 char	*gn_strchr(char *s, int c);
 char	*gn_strjoin(char *s1, char *s2);
 char	*get_next_line(int fd);
@@ -112,8 +112,12 @@ int		ft_strlen_no_nl(char *s);
 int		check_arg(int argc, char **argv);
 int		checker_2(t_cub3d *zop, char **argv);
 int		map_lines(int fd, t_cub3d *zop);
-void	find_player(t_cub3d *main_cub);
-
+int		find_player(t_cub3d *main_cub);
+void	tdimarr_clear(char	**arrclear);
 void	print_arg(char **args);
+int		file_lines(int fd, t_cub3d *main_cub);
+int		create_file_arr(int fd, t_cub3d *main_cub);
+void	rect_map(t_map *c_map);
+int		parse_file(t_cub3d *main_cub);
 
 #endif

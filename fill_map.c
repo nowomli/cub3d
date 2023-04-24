@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/20 16:35:10 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/22 15:10:27 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/24 13:41:13 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,14 @@
 
 #include "cub3d.h"
 
-void	find_player(t_cub3d *main_cub)
+int	find_player(t_cub3d *main_cub)
 {
 	int	i;
 	int	j;
+	int	found;
 
 	i = -1;
+	found = 0;
 	while (main_cub->c_map->ar_map[++i])
 	{
 		j = -1;
@@ -28,6 +30,7 @@ void	find_player(t_cub3d *main_cub)
 		{
 			if (main_cub->c_map->ar_map[i][j] == 'N' || main_cub->c_map->ar_map[i][j] == 'S' || main_cub->c_map->ar_map[i][j] == 'W' || main_cub->c_map->ar_map[i][j] == 'E')
 			{
+				found++;
 				main_cub->pl_pos = ft_calloc(1, sizeof(t_player));
 				main_cub->pl_pos->x = j + 0.5f;
 				main_cub->pl_pos->y = i + 0.5f;
@@ -43,6 +46,12 @@ void	find_player(t_cub3d *main_cub)
 			}
 		}
 	}
+	if (found != 1)
+	{
+		printf("Player position wrong\n");
+		return (0);
+	}
+	return (1);
 }
 
 // менять размер окна
