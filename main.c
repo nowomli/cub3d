@@ -6,7 +6,7 @@
 /*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/26 15:19:27 by inovomli         ###   ########.fr       */
+/*   Updated: 2023/04/26 15:59:30 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -434,6 +434,32 @@ int check_ext(char *path)
 		return (1);
 }
 
+void free_everything(t_cub3d *m_cub)
+{
+	mlx_delete_texture(m_cub->c_map->ea);
+	mlx_delete_texture(m_cub->c_map->no);
+	mlx_delete_texture(m_cub->c_map->so);
+	mlx_delete_texture(m_cub->c_map->we);
+	tdimarr_clear(m_cub->c_map->ar_map);	
+}
+
+void init_cub(t_cub3d *cub)
+{
+	cub->c_map->ea = mlx_load_png(cub->c_map->east_path);
+	cub->c_map->no = mlx_load_png(cub->c_map->north_path);
+	cub->c_map->so = mlx_load_png(cub->c_map->south_path);
+	cub->c_map->we = mlx_load_png(cub->c_map->west_path);
+	cub->c_map->f_color = ft_pixel(cub->c_map->f_color_r,
+		cub->c_map->f_color_g, cub->c_map->f_color_b, 255);
+	cub->c_map->c_color = ft_pixel(cub->c_map->c_color_r,
+		cub->c_map->c_color_g, cub->c_map->c_color_b, 255);
+	cub->view_angle = M_PI / 3;
+	cub->minone = NULL;
+	cub->mintwo = NULL;
+	cub->minthree = NULL;
+	cub->image = mlx_new_image(cub->mlx, cub->mlx->width, cub->mlx->height);
+}
+
 int32_t	main(int32_t argc, char *argv[])
 {
 	t_cub3d		m_cub;
@@ -446,25 +472,11 @@ int32_t	main(int32_t argc, char *argv[])
 	}
 	else
 		return (1);
-	m_cub.c_map->ea = mlx_load_png(m_cub.c_map->east_path);
-	m_cub.c_map->no = mlx_load_png(m_cub.c_map->north_path);
-	m_cub.c_map->so = mlx_load_png(m_cub.c_map->south_path);
-	m_cub.c_map->we = mlx_load_png(m_cub.c_map->west_path);
-	m_cub.c_map->f_color = ft_pixel(m_cub.c_map->f_color_r, m_cub.c_map->f_color_g, m_cub.c_map->f_color_b, 255);
-	m_cub.c_map->c_color = ft_pixel(m_cub.c_map->c_color_r, m_cub.c_map->c_color_g, m_cub.c_map->c_color_b, 255);
-	m_cub.view_angle = M_PI / 3;
-	m_cub.minone = NULL;
-	m_cub.mintwo = NULL;
-	m_cub.minthree = NULL;
-	m_cub.image = mlx_new_image(m_cub.mlx, m_cub.mlx->width, m_cub.mlx->height);
+	init_cub(&m_cub);
 	redraw_all(&m_cub);
 	mlx_loop_hook(m_cub.mlx, ft_hook, &m_cub);
 	mlx_loop(m_cub.mlx);
 	mlx_terminate(m_cub.mlx);
-	mlx_delete_texture(m_cub.c_map->ea);
-	mlx_delete_texture(m_cub.c_map->no);
-	mlx_delete_texture(m_cub.c_map->so);
-	mlx_delete_texture(m_cub.c_map->we);
-	tdimarr_clear(m_cub.c_map->ar_map);
+	free_everything(&m_cub);
 	return (0);
 }
