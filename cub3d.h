@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 15:54:34 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/24 13:05:54 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/25 18:52:08 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,11 @@ typedef struct s_norm
 	int32_t	cmh;
 }	t_norm;
 
-
+typedef struct s_point
+{
+	int x;
+	int y;
+}	t_point;
 
 typedef struct s_map
 {
@@ -89,6 +93,8 @@ typedef struct s_cub3D
 {
     mlx_t           *mlx;
     t_map           *c_map;
+	t_map           *temp_c_map;
+	char			**temp_map;
     t_player        *pl_pos;
     mlx_image_t     *cur_img;
 	mlx_image_t     *image;
@@ -102,6 +108,7 @@ typedef struct s_cub3D
 	mlx_texture_t	*mintwo;
 	mlx_texture_t	*minthree;
 	bool			resize;
+	int				status;
 } t_cub3d;
 
 int		read_file(t_cub3d *zop, char **argv);
