@@ -6,7 +6,7 @@
 /*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/26 15:59:30 by inovomli         ###   ########.fr       */
+/*   Updated: 2023/04/26 18:04:26 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int32_t	ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
 	return (r << 24 | g << 16 | b << 8 | a);
 }
 
-int	get_color(mlx_texture_t *texture, int x_coord, int y_coord)
+int	gtcl(mlx_texture_t *texture, int x_coord, int y_coord)
 {
 	int			byte;
 	uint32_t	color;
@@ -82,14 +82,16 @@ void	draw_txtr_line(mlx_texture_t *txtr, t_cub3d *s_cub, t_raycst *rt, int i)
 		else
 			t.txt_y1 = t.y * txtr->height / (rt->cl_h + 0.00001f);
 		t.txt_x1 = txtr->width * ((float)rt->y1 - (int)rt->y1);
+		if (txtr == s_cub->c_map->so)
+			t.txt_x = txtr->width - t.txt_x;
+		if (txtr == s_cub->c_map->we)
+			t.txt_x1 = txtr->width - t.txt_x1;			
 		t.h = min(rt->cl_h, t.cmh);
 		t.n = min(max((int)((t.cmh - t.h) / 2 + t.y), 0), t.cmh);
 		if ((txtr == s_cub->c_map->no) || (txtr == s_cub->c_map->so))
-			mlx_put_pixel(s_cub->image, i, t.n,
-				get_color(txtr, t.txt_x, t.txt_y1));
+			mlx_put_pixel(s_cub->image, i, t.n,	gtcl(txtr, t.txt_x, t.txt_y1));
 		if ((txtr == s_cub->c_map->we) || (txtr == s_cub->c_map->ea))
-			mlx_put_pixel(s_cub->image, i, t.n,
-				get_color(txtr, t.txt_x1, t.txt_y1));
+			mlx_put_pixel(s_cub->image, i, t.n,	gtcl(txtr, t.txt_x1, t.txt_y1));
 		++t.y;
 	}
 }
@@ -419,9 +421,9 @@ void	tdimarr_clear(char	**arrclear)
 	free(arrclear);
 }
 
-int check_ext(char *path)
+int	check_ext(char *path)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (!path)
@@ -434,25 +436,25 @@ int check_ext(char *path)
 		return (1);
 }
 
-void free_everything(t_cub3d *m_cub)
+void	free_everything(t_cub3d *m_cub)
 {
 	mlx_delete_texture(m_cub->c_map->ea);
 	mlx_delete_texture(m_cub->c_map->no);
 	mlx_delete_texture(m_cub->c_map->so);
 	mlx_delete_texture(m_cub->c_map->we);
-	tdimarr_clear(m_cub->c_map->ar_map);	
+	tdimarr_clear(m_cub->c_map->ar_map);
 }
 
-void init_cub(t_cub3d *cub)
+void	init_cub(t_cub3d *cub)
 {
 	cub->c_map->ea = mlx_load_png(cub->c_map->east_path);
 	cub->c_map->no = mlx_load_png(cub->c_map->north_path);
 	cub->c_map->so = mlx_load_png(cub->c_map->south_path);
 	cub->c_map->we = mlx_load_png(cub->c_map->west_path);
 	cub->c_map->f_color = ft_pixel(cub->c_map->f_color_r,
-		cub->c_map->f_color_g, cub->c_map->f_color_b, 255);
+			cub->c_map->f_color_g, cub->c_map->f_color_b, 255);
 	cub->c_map->c_color = ft_pixel(cub->c_map->c_color_r,
-		cub->c_map->c_color_g, cub->c_map->c_color_b, 255);
+			cub->c_map->c_color_g, cub->c_map->c_color_b, 255);
 	cub->view_angle = M_PI / 3;
 	cub->minone = NULL;
 	cub->mintwo = NULL;
@@ -463,7 +465,7 @@ void init_cub(t_cub3d *cub)
 int32_t	main(int32_t argc, char *argv[])
 {
 	t_cub3d		m_cub;
-	
+
 	m_cub.mlx = mlx_init(WIDTH, HEIGHT, "MLX42", false);
 	if ((argc == 2) && check_ext(argv[1]))
 	{
