@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+         #
+#    By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/16 11:49:23 by ccompote          #+#    #+#              #
-#    Updated: 2023/04/24 13:01:11 by ccompote         ###   ########.fr        #
+#    Updated: 2023/04/26 15:15:33 by inovomli         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,13 +17,13 @@ NAME =  cub3d
 OBJ_DIR = ./obj/
 OBJ_FILES = $(patsubst %.c, %.o, $(SRCS))
 OBJ	= $(addprefix $(OBJ_DIR), $(OBJ_FILES))
-# CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra
 LIBFT = ./libft
 MLX42 = ./MLX42
 SRCS_DIR = ./
 
 $(OBJ_DIR)%.o:$(SRCS_DIR)%.c
-	$(CC) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 all: obj libft MLX42 $(NAME)
 
@@ -31,7 +31,7 @@ obj:
 	mkdir -p $(OBJ_DIR)
 
 $(NAME): $(OBJ)
-	$(CC) $(OBJ) MLX42/build/libmlx42.a $(LIBFT)/libft.a -Iinclude -ldl -lglfw -L "$(shell brew --prefix glfw)/lib/" -pthread -lm -o $(NAME) 
+	$(CC) $(CFLAGS) $(OBJ) MLX42/build/libmlx42.a $(LIBFT)/libft.a -Iinclude -ldl -lglfw -L "$(shell brew --prefix glfw)/lib/" -pthread -lm -o $(NAME) 
 
 libft:
 	@$(MAKE) -C $(LIBFT)

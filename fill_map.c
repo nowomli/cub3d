@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fill_map.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
+/*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/20 16:35:10 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/25 13:57:16 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/26 15:31:17 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,13 @@ int	find_player(t_cub3d *main_cub)
 {
 	int	i;
 	int	j;
-	int	found;
+	static int	found = 0;
 
 	i = -1;
-	found = 0;
+	// found = 0;
 	while (main_cub->c_map->ar_map[++i])
 	{
 		j = -1;
-
 		while (main_cub->c_map->ar_map[i][++j] != '\n' && main_cub->c_map->ar_map[i][j])
 		{
 			if (main_cub->c_map->ar_map[i][j] == 'N' || main_cub->c_map->ar_map[i][j] == 'S' || main_cub->c_map->ar_map[i][j] == 'W' || main_cub->c_map->ar_map[i][j] == 'E')
@@ -48,7 +47,7 @@ int	find_player(t_cub3d *main_cub)
 	}
 	if (found != 1)
 	{
-		printf("Player position wrong\n");
+		printf("Player position wrong %d\n", found);
 		return (0);
 	}
 	return (1);

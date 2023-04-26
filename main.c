@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
+/*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/25 14:55:46 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/26 15:19:27 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,10 @@ void	draw_txtr_line(mlx_texture_t *txtr, t_cub3d *s_cub, t_raycst *rt, int i)
 
 	t.cmh = s_cub->mlx->height;
 	t.y = 0;
-	while (t.y < rt->cl_h && t.y < t.cmh)
+	while (t.y < (int)rt->cl_h && t.y < t.cmh)
 	{
 		t.txt_x = txtr->width * ((float)rt->x1 - (int)rt->x1);
-		if (rt->cl_h > t.cmh)
+		if ((int)rt->cl_h > t.cmh)
 			t.txt_y1 = ((rt->cl_h - t.cmh) / 2 + t.y)
 				* txtr->height / (rt->cl_h + 0.00001f);
 		else
@@ -124,6 +124,7 @@ mlx_texture_t	*determ_txt(t_cub3d *s_cub, t_raycst *raycst)
 	float			x1;
 	float			y1;
 
+	wrk_txt = NULL;
 	raycst->dist -= RTSTEP;
 	x1 = s_cub->pl_pos->x + raycst->dist * cosf(raycst->ang);
 	y1 = s_cub->pl_pos->y + raycst->dist * sinf(raycst->ang);
@@ -418,12 +419,27 @@ void	tdimarr_clear(char	**arrclear)
 	free(arrclear);
 }
 
+int check_ext(char *path)
+{
+	int i;
+
+	i = 0;
+	if (!path)
+		return (0);
+	while (path[i])
+		i++;
+	if (i < 5 || ft_strncmp(&path[i - 4], ".cub", 4) != 0)
+		return (0);
+	else
+		return (1);
+}
+
 int32_t	main(int32_t argc, char *argv[])
 {
 	t_cub3d		m_cub;
 	
 	m_cub.mlx = mlx_init(WIDTH, HEIGHT, "MLX42", false);
-	if (argc == 2)
+	if ((argc == 2) && check_ext(argv[1]))
 	{
 		if (!read_file(&m_cub, argv))
 			return (1);
