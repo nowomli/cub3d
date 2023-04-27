@@ -1,4 +1,4 @@
-F 220,100,0
+F 100,100,0
 NO images/no.png
 
 WE images/we.png
@@ -6,17 +6,17 @@ WE images/we.png
 
 SO images/so.png
 
-
 EA images/ea.png
 
-C 220,250,0
+
+C 0,100,0
 
 
 1111111
 1000001
-1S01001
 1001001
 1001001
-1111001
-1000001
+1001001
+1011001
+10000W1
 1111111

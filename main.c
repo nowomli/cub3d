@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/26 18:04:26 by inovomli         ###   ########.fr       */
+/*   Updated: 2023/04/27 18:31:06 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -473,7 +473,10 @@ int32_t	main(int32_t argc, char *argv[])
 			return (1);
 	}
 	else
+	{
+		printf("Error\n");
 		return (1);
+	}
 	init_cub(&m_cub);
 	redraw_all(&m_cub);
 	mlx_loop_hook(m_cub.mlx, ft_hook, &m_cub);

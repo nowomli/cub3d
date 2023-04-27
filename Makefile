@@ -3,15 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+         #
+#    By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/16 11:49:23 by ccompote          #+#    #+#              #
-#    Updated: 2023/04/26 15:15:33 by inovomli         ###   ########.fr        #
+#    Updated: 2023/04/27 19:36:22 by ccompote         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = gcc
-SRCS = main.c get_next_line.c get_next_line_utils.c create_map.c check_before_map.c fill_map.c  open_file.c 
+SRCS = main.c get_next_line.c get_next_line_utils.c create_map.c check_before_map.c fill_map.c  open_file.c  handle_colors.c \
+		map_utils.c 
 
 NAME =  cub3d
 OBJ_DIR = ./obj/

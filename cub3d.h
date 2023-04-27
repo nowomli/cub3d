@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 15:54:34 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/25 18:52:08 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/27 19:40:26 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,14 +87,13 @@ typedef struct s_map
 	mlx_texture_t	*so;
 	mlx_texture_t	*we;
 	mlx_texture_t	*ea;
+	char			**temp_map;
 } t_map;
 
 typedef struct s_cub3D
 {
     mlx_t           *mlx;
     t_map           *c_map;
-	t_map           *temp_c_map;
-	char			**temp_map;
     t_player        *pl_pos;
     mlx_image_t     *cur_img;
 	mlx_image_t     *image;
@@ -103,12 +102,10 @@ typedef struct s_cub3D
 	int			    file_rows;
 	float           view_angle;
 	int				fd;
-    char	        **tmp_map;
     mlx_texture_t	*minone;
 	mlx_texture_t	*mintwo;
 	mlx_texture_t	*minthree;
-	bool			resize;
-	int				status;
+	int				map_found;
 } t_cub3d;
 
 int		read_file(t_cub3d *zop, char **argv);
@@ -126,5 +123,9 @@ int		file_lines(int fd, t_cub3d *main_cub);
 int		create_file_arr(int fd, t_cub3d *main_cub);
 void	rect_map(t_map *c_map);
 int		parse_file(t_cub3d *main_cub);
+int		create_colors(t_map *c_map, char *line, char c);
+int		check_is_map(t_cub3d *main_cub, int i, int y);
+int		map_holes(t_map *map);
+int		find_pl(t_map *map, int *x, int *y);
 
 #endif
