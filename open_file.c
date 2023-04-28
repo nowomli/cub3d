@@ -6,21 +6,29 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/24 12:55:31 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/28 12:17:45 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/28 16:58:09 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
 
-void free_map(t_map *map)
+void free_map(t_cub3d *m_cub)
 {
-	tdimarr_clear(map->ar_map);
-	free(map->north_path);
-	free(map->south_path);
-	free(map->west_path);
-	free(map->east_path);
-	free(map);
+	if (m_cub->map_file)
+		tdimarr_clear(m_cub->map_file);
+	if (m_cub->c_map->ar_map)
+		tdimarr_clear(m_cub->c_map->ar_map);
+	if (m_cub->c_map->north_path)
+		free(m_cub->c_map->north_path);
+	if (m_cub->c_map->south_path)
+		free(m_cub->c_map->south_path);
+	if (m_cub->c_map->west_path)
+		free(m_cub->c_map->west_path);
+	if (m_cub->c_map->east_path)
+		free(m_cub->c_map->east_path);
+	if (m_cub->c_map)
+		free(m_cub->c_map);
 }
 
 
@@ -111,10 +119,14 @@ int	read_file(t_cub3d *main_cub, char **argv)
 {
 	main_cub->c_map = ft_calloc(1, sizeof(t_map));
 	if (!checker(main_cub, argv))
-		return (0);
+		return (free(main_cub->c_map), 0);
 	if (!parse_file(main_cub))
-		return (0);
+		return (free_map(main_cub), 0);
 	if (!check_image_files(main_cub))
+	{
+		free_map(main_cub);
+		free(main_cub->pl_pos);
 		return (0);
+	}
 	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 16:00:08 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/28 15:27:22 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/28 17:05:27 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,9 +203,7 @@ int	parse_file(t_cub3d *main_cub)
 		if (main_cub->map_file[i][j] == 'F')
 		{
 			if (create_colors(main_cub->c_map, main_cub->map_file[i], 'F'))
-			{
 				found++;
-			}
 			else
 			{
 				printf("Error\nWrong config file color\n");
@@ -215,9 +213,7 @@ int	parse_file(t_cub3d *main_cub)
 		else if (main_cub->map_file[i][j] == 'C')
 		{
 			if (create_colors(main_cub->c_map, main_cub->map_file[i], 'C'))
-			{
 				found++;
-			}
 			else
 			{
 				printf("Error\nWrong config file color\n");
@@ -230,9 +226,7 @@ int	parse_file(t_cub3d *main_cub)
 			|| !ft_strncmp(main_cub->map_file[i], "EA ", 3))
 		{
 			if (create_images(main_cub->c_map, main_cub->map_file[i]))
-			{
 				found++;
-			}
 			else
 			{
 				printf("Error\nWrong config file\n");
@@ -255,11 +249,7 @@ int	parse_file(t_cub3d *main_cub)
 					printf("Error\nWrong config file here\n");
 					return (0);
 				}
-				if (!find_player(main_cub))
-				{
-					printf("Wrong config file\n");
-					return (0);
-				}
+				find_player(main_cub);
 				rect_map(main_cub->c_map);
 				i = i + main_cub->c_map->rows;
 				found++;
@@ -279,7 +269,15 @@ int	parse_file(t_cub3d *main_cub)
 		printf("Error\nWrong config file\n");
 		return (0);
 	}
-	tdimarr_clear(main_cub->map_file);
+	// tdimarr_clear(main_cub->map_file);
+	// tdimarr_clear(main_cub->c_map->ar_map);
+	// main_cub->c_map->ar_map = ft_calloc(5, sizeof(char *));
+	// main_cub->c_map->ar_map[0] = "1111111";
+	// main_cub->c_map->ar_map[1] = "1000001";
+	// main_cub->c_map->ar_map[2] = "1001001";
+	// main_cub->c_map->ar_map[3] = "1000001";
+	// main_cub->c_map->ar_map[4] = "1111111";
+	// printf("%d row %d col\n", main_cub->c_map->rows, main_cub->c_map->column);
 	return (1);
 }
 

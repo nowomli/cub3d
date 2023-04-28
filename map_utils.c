@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/27 19:32:08 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/28 15:33:23 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/28 17:31:41 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,11 +89,11 @@ int	map_holes(t_map *map)
 	// main_cub->temp_c_map->column = main_cub->c_map->column;
 	// rect_map_null(main_cub->temp_c_map);
 	rect_map_null(map);
-
 	if (!find_pl(map, &x, &y))
+	{
+		tdimarr_clear(map->temp_map);
 		return (0);
-		
-		
+	}
 	// print_arg(main_cub->temp_c_map->ar_map);
 	// printf("%f%f\n", main_cub->pl_pos->x, main_cub->pl_pos->y);
 	// int		x;
