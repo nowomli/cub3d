@@ -6,7 +6,7 @@
 /*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/28 17:44:26 by inovomli         ###   ########.fr       */
+/*   Updated: 2023/04/28 18:01:41 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,23 @@ int	max(int a, int b)
 	return (b);
 }
 
+void	add_norm(mlx_texture_t *txtr, t_norm *t, t_cub3d *s_cub, t_raycst *rt)
+{
+	if (txtr == s_cub->c_map->so)
+		t->txt_x = txtr->width - t->txt_x;
+	if (txtr == s_cub->c_map->we)
+		t->txt_x1 = txtr->width - t->txt_x1;
+	t->h = min(rt->cl_h, t->cmh);
+	t->n = min(max((int)((t->cmh - t->h) / 2 + t->y), 0), t->cmh);
+}
+
 void	draw_txtr_line(mlx_texture_t *txtr, t_cub3d *s_cub, t_raycst *rt, int i)
 {
 	t_norm	t;
 
-	if ((t.cmh = s_cub->mlx->height) && (t.y = 0) && (txtr == NULL))
+	t.cmh = s_cub->mlx->height;
+	t.y = 0;
+	if (txtr == NULL)
 		return ;
 	while (t.y < (int)rt->cl_h && t.y < t.cmh)
 	{
@@ -82,16 +94,11 @@ void	draw_txtr_line(mlx_texture_t *txtr, t_cub3d *s_cub, t_raycst *rt, int i)
 		else
 			t.txt_y1 = t.y * txtr->height / (rt->cl_h + 0.00001f);
 		t.txt_x1 = txtr->width * ((float)rt->y1 - (int)rt->y1);
-		if (txtr == s_cub->c_map->so)
-			t.txt_x = txtr->width - t.txt_x;
-		if (txtr == s_cub->c_map->we)
-			t.txt_x1 = txtr->width - t.txt_x1;			
-		t.h = min(rt->cl_h, t.cmh);
-		t.n = min(max((int)((t.cmh - t.h) / 2 + t.y), 0), t.cmh);
+		add_norm(txtr, &t, s_cub, rt);
 		if ((txtr == s_cub->c_map->no) || (txtr == s_cub->c_map->so))
-			mlx_put_pixel(s_cub->image, i, t.n,	gtcl(txtr, t.txt_x, t.txt_y1));
+			mlx_put_pixel(s_cub->image, i, t.n, gtcl(txtr, t.txt_x, t.txt_y1));
 		if ((txtr == s_cub->c_map->we) || (txtr == s_cub->c_map->ea))
-			mlx_put_pixel(s_cub->image, i, t.n,	gtcl(txtr, t.txt_x1, t.txt_y1));
+			mlx_put_pixel(s_cub->image, i, t.n, gtcl(txtr, t.txt_x1, t.txt_y1));
 		++t.y;
 	}
 }
