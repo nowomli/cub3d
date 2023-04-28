@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
+/*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/28 15:31:20 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/28 17:23:14 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,8 +71,8 @@ void	draw_txtr_line(mlx_texture_t *txtr, t_cub3d *s_cub, t_raycst *rt, int i)
 {
 	t_norm	t;
 
-	t.cmh = s_cub->mlx->height;
-	t.y = 0;
+	if ((t.cmh = s_cub->mlx->height) && (t.y = 0) && (txtr == NULL))
+		return ;
 	while (t.y < (int)rt->cl_h && t.y < t.cmh)
 	{
 		t.txt_x = txtr->width * ((float)rt->x1 - (int)rt->x1);
