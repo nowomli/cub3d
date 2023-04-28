@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
+/*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/28 17:36:03 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/28 17:44:26 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,7 @@ void	draw_line(t_raycst *rt, t_cub3d *s_cub)
 	rt->cl_h = s_cub->mlx->height
 		/ (rt->dist * cosf(rt->ang - s_cub->pl_pos->angle));
 	wrk_txt = determ_txt(s_cub, rt);
-	// fix_artifact(s_cub, wrk_txt, rt);
+	fix_artifact(s_cub, wrk_txt, rt);
 	draw_txtr_line(wrk_txt, s_cub, rt, rt->i);
 }
 
@@ -198,7 +198,7 @@ void	redraw_all(t_cub3d *s_cub)
 	while (rt.i < s_cub->mlx->width)
 	{
 		small_preset(&rt, s_cub);
-		while (rt.dist < 20)
+		while (rt.dist < 30)
 		{
 			rt.x1 = s_cub->pl_pos->x + rt.dist * cosf(rt.ang);
 			rt.y1 = s_cub->pl_pos->y + rt.dist * sinf(rt.ang);
