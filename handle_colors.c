@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/27 17:26:48 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/27 19:18:17 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/28 15:34:55 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,9 +78,12 @@ int	create_colors(t_map *c_map, char *line, char c)
 {
 	char 	**tmp;
 	int 	i;
+	char	**new_line;
+	
 
 	i = 0;
-	tmp = ft_split(line, ',');
+	new_line = ft_split(line, c);
+	tmp = ft_split(new_line[0], ',');
 	if (!tmp)
 		return (0);
 	while (tmp[i])
@@ -94,10 +97,11 @@ int	create_colors(t_map *c_map, char *line, char c)
 				return (0);
             }
 		if (c == 'C')
-			return (color_ceiling(c_map, tmp));
+			return (tdimarr_clear(new_line), color_ceiling(c_map, tmp));
 		else if (c == 'F')
-			return (color_floor(c_map, tmp));
+			return (tdimarr_clear(new_line), color_floor(c_map, tmp));
 		
 	}
+	
 	return (0);
 }

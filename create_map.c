@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 16:00:08 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/27 19:47:25 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/28 15:27:22 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,14 +197,11 @@ int	parse_file(t_cub3d *main_cub)
 	{
 		j = 0;
 		while (main_cub->map_file[i][j] == ' ' || main_cub->map_file[i][j] == '\t')
-			main_cub->map_file[i]++;
+			j++;
 		while (main_cub->map_file[i][j] == '\n')
 			i++;
 		if (main_cub->map_file[i][j] == 'F')
 		{
-			main_cub->map_file[i] += 2;
-			while (main_cub->map_file[i][j] == ' ' || main_cub->map_file[i][j] == '\t')
-				main_cub->map_file[i]++;
 			if (create_colors(main_cub->c_map, main_cub->map_file[i], 'F'))
 			{
 				found++;
@@ -217,9 +214,6 @@ int	parse_file(t_cub3d *main_cub)
 		}
 		else if (main_cub->map_file[i][j] == 'C')
 		{
-			main_cub->map_file[i] += 2;
-			while (main_cub->map_file[i][j] == ' ' || main_cub->map_file[i][j] == '\t')
-				main_cub->map_file[i]++;
 			if (create_colors(main_cub->c_map, main_cub->map_file[i], 'C'))
 			{
 				found++;
@@ -285,7 +279,7 @@ int	parse_file(t_cub3d *main_cub)
 		printf("Error\nWrong config file\n");
 		return (0);
 	}
-
+	tdimarr_clear(main_cub->map_file);
 	return (1);
 }
 

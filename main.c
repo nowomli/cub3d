@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/27 18:31:06 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/28 15:31:20 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -402,11 +402,10 @@ void	ft_hook(void *param)
 // 	return (hope);
 // }
 
-// void	checkleaks(void)
-// {
-// 	system("leaks a.out");
-// }
-// 	atexit(checkleaks);
+void	checkleaks(void)
+{
+	system("leaks cub3d");
+}
 
 void	tdimarr_clear(char	**arrclear)
 {
@@ -442,7 +441,8 @@ void	free_everything(t_cub3d *m_cub)
 	mlx_delete_texture(m_cub->c_map->no);
 	mlx_delete_texture(m_cub->c_map->so);
 	mlx_delete_texture(m_cub->c_map->we);
-	tdimarr_clear(m_cub->c_map->ar_map);
+	free_map(m_cub->c_map);
+	free(m_cub->pl_pos);
 }
 
 void	init_cub(t_cub3d *cub)
@@ -466,6 +466,7 @@ int32_t	main(int32_t argc, char *argv[])
 {
 	t_cub3d		m_cub;
 
+	atexit(checkleaks);
 	m_cub.mlx = mlx_init(WIDTH, HEIGHT, "MLX42", false);
 	if ((argc == 2) && check_ext(argv[1]))
 	{

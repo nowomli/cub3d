@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/27 19:32:08 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/27 19:39:56 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/28 15:33:23 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void	rect_map_null(t_map *c_map)
 		i++;
 	}
 	new_map[i] = NULL;
+	tdimarr_clear(c_map->temp_map);
 	c_map->temp_map = new_map;
 }
 
@@ -56,19 +57,6 @@ char	**arr_cpy(char **src, int size)
 	}
 	dst[i] = NULL;
 	return (dst);
-}
-
-void	clean_map(char **arr, int size)
-{
-	int	y;
-
-	y = 0;
-	while (y < size)
-	{
-		free(arr[y]);
-		y++;
-	}
-	free(arr);
 }
 
 bool	dfs(t_map *map, int x, int y)
@@ -111,6 +99,6 @@ int	map_holes(t_map *map)
 	// int		x;
 	// int		y;
 	res = dfs(map, x, y);
-	// clean_map(map->temp_map, map->rows);
+	tdimarr_clear(map->temp_map);
 	return (res);
 }

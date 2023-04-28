@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/20 16:35:10 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/27 19:39:48 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/28 15:31:55 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void	rect_map(t_map *c_map)
 		i++;
 	}
 	new_map[i] = NULL;
+	tdimarr_clear(c_map->ar_map);
 	c_map->ar_map = new_map;
 }
 

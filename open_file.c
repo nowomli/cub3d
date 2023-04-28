@@ -6,11 +6,22 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/24 12:55:31 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/27 19:46:16 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/28 12:17:45 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+
+
+void free_map(t_map *map)
+{
+	tdimarr_clear(map->ar_map);
+	free(map->north_path);
+	free(map->south_path);
+	free(map->west_path);
+	free(map->east_path);
+	free(map);
+}
 
 
 int	create_file_arr(int fd, t_cub3d *main_cub)
