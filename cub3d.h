@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
+/*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 15:54:34 by ccompote          #+#    #+#             */
-/*   Updated: 2023/05/01 11:37:22 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/05/01 12:12:34 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,34 @@ typedef struct s_cub3D
 	int				i_file;
 }	t_cub3d;
 
+typedef mlx_texture_t	t_mlxt;
+
+// nm_main1
+void	print_arg(char **args);
+int32_t	ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a);
+int		gtcl(mlx_texture_t *texture, int x_coord, int y_coord);
+int		min(int a, int b);
+int		max(int a, int b);
+// nm_main2
+void	add_norm(mlx_texture_t *txtr, t_norm *t, t_cub3d *s_cub, t_raycst *rt);
+void	draw_txtr_lin(mlx_texture_t *txtr, t_cub3d *s_cub, t_raycst *rt, int i);
+void	draw_flcl(t_cub3d *s_cub);
+void	fix_artifact(t_cub3d *s_cub, mlx_texture_t *wrk_txt, t_raycst *rt);
+t_mlxt	*determ_txt(t_cub3d *s_cub, t_raycst *raycst);
+// nm_main3
+void	small_preset(t_raycst *rt, t_cub3d *s_cub);
+void	draw_line(t_raycst *rt, t_cub3d *s_cub);
+void	redraw_all(t_cub3d *s_cub);
+int		check_wall(t_cub3d *s_cub, float dispX, float dispY);
+void	checkleaks(void);
+// nm_main4
+void	mv_pl_rt(t_cub3d *s_cub, float dx, float dy);
+void	mv_pl_lf(t_cub3d *s_cub, float dx, float dy);
+void	mv_pl_up(t_cub3d *s_cub, float dx, float dy);
+void	move_pl(t_cub3d *s_cub, t_mv_dir dir);
+void	tdimarr_clear(char	**arrclear);
+
+void	free_everything(t_cub3d *m_cub);
 int		read_file(t_cub3d *zop, char **argv);
 char	*gn_strchr(char *s, int c);
 char	*gn_strjoin(char *s1, char *s2);
@@ -118,8 +146,7 @@ int		check_arg(int argc, char **argv);
 int		checker_2(t_cub3d *zop, char **argv);
 int		map_lines(int fd, t_cub3d *zop);
 int		find_player(t_cub3d *main_cub);
-void	tdimarr_clear(char	**arrclear);
-void	print_arg(char **args);
+
 int		file_lines(int fd, t_cub3d *main_cub);
 int		create_file_arr(int fd, t_cub3d *main_cub);
 void	rect_map(t_map *c_map);

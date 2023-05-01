@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+         #
+#    By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/16 11:49:23 by ccompote          #+#    #+#              #
-#    Updated: 2023/05/01 11:37:39 by ccompote         ###   ########.fr        #
+#    Updated: 2023/05/01 12:11:21 by inovomli         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = gcc
 SRCS = main.c get_next_line.c get_next_line_utils.c create_map.c fill_map.c  open_file.c  handle_colors.c \
-		map_utils.c handle_images.c map_utils_2.c 
+		map_utils.c handle_images.c map_utils_2.c nm_main1.c nm_main2.c nm_main3.c nm_main4.c
 
 NAME =  cub3d
 OBJ_DIR = ./obj/
@@ -43,12 +43,12 @@ libft:
 clean:
 	rm -f $(OBJ)
 	@$(MAKE) -C $(LIBFT) clean
-	# @$(MAKE) -C $(MLX42)/build clean
+# @$(MAKE) -C $(MLX42)/build clean
 
 fclean: clean
 	rm -f $(NAME)
 	@$(MAKE) -C $(LIBFT) fclean
-	# @$(MAKE) -C $(MLX42) fclean
+# @$(MAKE) -C $(MLX42) fclean
 
 re: fclean all
 

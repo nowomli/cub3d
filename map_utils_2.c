@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_utils_2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
+/*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/01 11:36:17 by ccompote          #+#    #+#             */
-/*   Updated: 2023/05/01 11:37:12 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/05/01 12:11:58 by inovomli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,4 +43,14 @@ int	check_png(char *path)
 		return (0);
 	}
 	return (1);
+}
+
+void	free_everything(t_cub3d *m_cub)
+{
+	mlx_delete_texture(m_cub->c_map->ea);
+	mlx_delete_texture(m_cub->c_map->no);
+	mlx_delete_texture(m_cub->c_map->so);
+	mlx_delete_texture(m_cub->c_map->we);
+	free_map(m_cub);
+	free(m_cub->pl_pos);
 }
