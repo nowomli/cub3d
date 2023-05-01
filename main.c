@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/30 16:33:10 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/05/01 10:28:33 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,23 @@ int	max(int a, int b)
 	return (b);
 }
 
+void	add_norm(mlx_texture_t *txtr, t_norm *t, t_cub3d *s_cub, t_raycst *rt)
+{
+	if (txtr == s_cub->c_map->so)
+		t->txt_x = txtr->width - t->txt_x;
+	if (txtr == s_cub->c_map->we)
+		t->txt_x1 = txtr->width - t->txt_x1;
+	t->h = min(rt->cl_h, t->cmh);
+	t->n = min(max((int)((t->cmh - t->h) / 2 + t->y), 0), t->cmh);
+}
+
 void	draw_txtr_line(mlx_texture_t *txtr, t_cub3d *s_cub, t_raycst *rt, int i)
 {
 	t_norm	t;
 
-	if ((t.cmh = s_cub->mlx->height) && (t.y = 0) && (txtr == NULL))
+	t.cmh = s_cub->mlx->height;
+	t.y = 0;
+	if (txtr == NULL)
 		return ;
 	while (t.y < (int)rt->cl_h && t.y < t.cmh)
 	{
@@ -90,7 +102,9 @@ void	draw_txtr_line(mlx_texture_t *txtr, t_cub3d *s_cub, t_raycst *rt, int i)
 		t.n = min(max((int)((t.cmh - t.h) / 2 + t.y), 0), t.cmh);
 		if ((txtr == s_cub->c_map->no) || (txtr == s_cub->c_map->so))
 			mlx_put_pixel(s_cub->image, i, t.n, gtcl(txtr, t.txt_x, t.txt_y1));
+			mlx_put_pixel(s_cub->image, i, t.n, gtcl(txtr, t.txt_x, t.txt_y1));
 		if ((txtr == s_cub->c_map->we) || (txtr == s_cub->c_map->ea))
+			mlx_put_pixel(s_cub->image, i, t.n, gtcl(txtr, t.txt_x1, t.txt_y1));
 			mlx_put_pixel(s_cub->image, i, t.n, gtcl(txtr, t.txt_x1, t.txt_y1));
 		++t.y;
 	}
@@ -185,7 +199,7 @@ void	draw_line(t_raycst *rt, t_cub3d *s_cub)
 	rt->cl_h = s_cub->mlx->height
 		/ (rt->dist * cosf(rt->ang - s_cub->pl_pos->angle));
 	wrk_txt = determ_txt(s_cub, rt);
-	// fix_artifact(s_cub, wrk_txt, rt);
+	fix_artifact(s_cub, wrk_txt, rt);
 	draw_txtr_line(wrk_txt, s_cub, rt, rt->i);
 }
 
@@ -198,7 +212,7 @@ void	redraw_all(t_cub3d *s_cub)
 	while (rt.i < s_cub->mlx->width)
 	{
 		small_preset(&rt, s_cub);
-		while (rt.dist < 20)
+		while (rt.dist < 30)
 		{
 			rt.x1 = s_cub->pl_pos->x + rt.dist * cosf(rt.ang);
 			rt.y1 = s_cub->pl_pos->y + rt.dist * sinf(rt.ang);
