@@ -6,13 +6,13 @@
 #    By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/16 11:49:23 by ccompote          #+#    #+#              #
-#    Updated: 2023/04/28 16:31:52 by ccompote         ###   ########.fr        #
+#    Updated: 2023/05/01 11:37:39 by ccompote         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = gcc
 SRCS = main.c get_next_line.c get_next_line_utils.c create_map.c fill_map.c  open_file.c  handle_colors.c \
-		map_utils.c 
+		map_utils.c handle_images.c map_utils_2.c 
 
 NAME =  cub3d
 OBJ_DIR = ./obj/

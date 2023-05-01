@@ -6,11 +6,33 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/27 19:32:08 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/30 16:23:38 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/05/01 11:42:38 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+
+int	file_lines(int fd, t_cub3d *main_cub)
+{
+	int		i;
+	char	*str;
+
+	i = 0;
+	str = get_next_line(fd);
+	if (str == NULL)
+		return (0);
+	i++;
+	while (str)
+	{
+		free(str);
+		str = get_next_line(fd);
+		if (!str)
+			break ;
+		i++;
+	}
+	main_cub->file_rows = i;
+	return (1);
+}
 
 void	rect_map_null(t_map *c_map)
 {
@@ -77,22 +99,12 @@ int	map_holes(t_map *map)
 	int		x;
 	int		y;
 
-	// map->temp_map = arr_cpy(map->ar_map, map->rows);
-	// main_cub->temp_c_map = ft_calloc(1, sizeof(t_map));
-	// main_cub->temp_c_map->ar_map = arr_cpy(main_cub->c_map->ar_map, main_cub->c_map->rows);
-	// main_cub->temp_c_map->rows = main_cub->c_map->rows;
-	// main_cub->temp_c_map->column = main_cub->c_map->column;
-	// rect_map_null(main_cub->temp_c_map);
 	rect_map_null(map);
 	if (!find_pl(map, &x, &y))
 	{
 		tdimarr_clear(map->temp_map);
 		return (0);
 	}
-	// print_arg(main_cub->temp_c_map->ar_map);
-	// printf("%f%f\n", main_cub->pl_pos->x, main_cub->pl_pos->y);
-	// int		x;
-	// int		y;
 	res = dfs(map, x, y);
 	tdimarr_clear(map->temp_map);
 	return (res);

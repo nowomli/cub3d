@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: inovomli <inovomli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/05/01 11:35:10 by inovomli         ###   ########.fr       */
+/*   Updated: 2023/05/01 11:41:52 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -379,36 +379,6 @@ void	ft_hook(void *param)
 		move_pl(s_cub, rot_lf);
 }
 
-// -----------------------------------------------------------------------------
-
-// char	**feed_map(char *path)
-// {
-// 	char	**hope;
-// 	int		rowsize = 13;
-// 	int i = 0;
-
-// 	char *filename = path;
-// 	FILE *fp = fopen(filename, "r");
-
-// 	hope = malloc(sizeof(char *) * (rowsize + 1));
-// 	if (fp == NULL)
-// 	{
-// 		printf("Error: could not open file %s", filename);
-// 		return 0;
-// 	}
-// 	const unsigned MAX_LENGTH = 256;
-// 	char buffer[MAX_LENGTH];
-// 	while (fgets(buffer, MAX_LENGTH, fp))
-// 	{
-// 		hope[i] = malloc(sizeof(char) * 9);
-// 		strcpy(hope[i++],buffer);
-// 		// printf("%s", buffer);
-// 	}
-// 	hope[i] = 0;
-// 	fclose(fp);
-// 	return (hope);
-// }
-
 void	checkleaks(void)
 {
 	system("leaks cub3d");
@@ -473,7 +443,6 @@ int32_t	main(int32_t argc, char *argv[])
 {
 	t_cub3d		m_cub;
 
-	atexit(checkleaks);
 	m_cub.mlx = mlx_init(WIDTH, HEIGHT, "MLX42", false);
 	if ((argc == 2) && check_ext(argv[1]))
 	{

@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 15:54:34 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/30 23:53:34 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/05/01 11:37:22 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,5 +130,7 @@ int		map_holes(t_map *map);
 int		find_pl(t_map *map, int *x, int *y);
 void	free_arr(char **arr);
 void	free_map(t_cub3d *m_cub);
+int		create_images(t_map *c_map, char *line);
+int		check_png(char *path);
 
 #endif

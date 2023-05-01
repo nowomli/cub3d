@@ -6,29 +6,11 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/24 12:55:31 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/30 16:16:05 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/05/01 11:36:30 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-void	free_map(t_cub3d *m_cub)
-{
-	if (m_cub->map_file)
-		tdimarr_clear(m_cub->map_file);
-	if (m_cub->c_map->ar_map)
-		tdimarr_clear(m_cub->c_map->ar_map);
-	if (m_cub->c_map->north_path)
-		free(m_cub->c_map->north_path);
-	if (m_cub->c_map->south_path)
-		free(m_cub->c_map->south_path);
-	if (m_cub->c_map->west_path)
-		free(m_cub->c_map->west_path);
-	if (m_cub->c_map->east_path)
-		free(m_cub->c_map->east_path);
-	if (m_cub->c_map)
-		free(m_cub->c_map);
-}
 
 int	create_file_arr(int fd, t_cub3d *main_cub)
 {
