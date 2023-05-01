@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/20 16:35:10 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/28 15:31:55 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/30 21:38:09 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,33 +14,31 @@
 
 void	rect_map(t_map *c_map)
 {
-	char	**new_map;
 	int		i;
 	int		j;
 
 	i = 0;
-	new_map = ft_calloc(c_map->rows + 1, sizeof(char *));
+	c_map->temp_map = ft_calloc(c_map->rows + 1, sizeof(char *));
 	while (i < c_map->rows)
 	{
 		j = 0;
-		new_map[i] = ft_calloc((c_map->column + 1), sizeof(char));
+		c_map->temp_map[i] = ft_calloc((c_map->column + 1), sizeof(char));
 		while (j < c_map->column)
 		{
-			if (c_map->ar_map[i][j]
-				&& (ft_isdigit(c_map->ar_map[i][j])
+			if (c_map->ar_map[i][j] && (ft_isdigit(c_map->ar_map[i][j])
 				|| ft_strchr("NSEW", c_map->ar_map[i][j]))
 				&& (j <= ft_strlen(c_map->ar_map[i])))
-				new_map[i][j] = c_map->ar_map[i][j];
+				c_map->temp_map[i][j] = c_map->ar_map[i][j];
 			else
-				new_map[i][j] = '1';
+				c_map->temp_map[i][j] = '1';
 			j++;
 		}
-		new_map[i][c_map->column] = '\0';
+		c_map->temp_map[i][c_map->column] = '\0';
 		i++;
 	}
-	new_map[i] = NULL;
+	c_map->temp_map[i] = NULL;
 	tdimarr_clear(c_map->ar_map);
-	c_map->ar_map = new_map;
+	c_map->ar_map = c_map->temp_map;
 }
 
 int	find_pl(t_map *map, int *x, int *y)
@@ -71,64 +69,76 @@ int	find_pl(t_map *map, int *x, int *y)
 	return (1);
 }
 
+int	found_pl_sides(t_cub3d *main_cub, int i, int j)
+{
+	main_cub->pl_pos = ft_calloc(1, sizeof(t_player));
+	if (!main_cub->pl_pos)
+		return (0);
+	main_cub->pl_pos->x = j + 0.5f;
+	main_cub->pl_pos->y = i + 0.5f;
+	if (main_cub->c_map->ar_map[i][j] == 'N')
+		main_cub->pl_pos->angle = 1.5 * M_PI;
+	else if (main_cub->c_map->ar_map[i][j] == 'S')
+		main_cub->pl_pos->angle = 0.5 * M_PI;
+	else if (main_cub->c_map->ar_map[i][j] == 'W')
+		main_cub->pl_pos->angle = 0;
+	else if (main_cub->c_map->ar_map[i][j] == 'E')
+		main_cub->pl_pos->angle = 1 * M_PI;
+	main_cub->c_map->ar_map[i][j] = '0';
+	return (1);
+}
+
 int	find_player(t_cub3d *main_cub)
 {
-	int	i;
-	int	j;
+	int			i;
+	int			j;
 	static int	found = 0;
 
 	i = -1;
 	while (main_cub->c_map->ar_map[++i])
 	{
 		j = -1;
-		while (main_cub->c_map->ar_map[i][++j] != '\n' && main_cub->c_map->ar_map[i][j])
+		while (main_cub->c_map->ar_map[i][++j] != '\n'
+			&& main_cub->c_map->ar_map[i][j])
 		{
-			if (main_cub->c_map->ar_map[i][j] == 'N' || main_cub->c_map->ar_map[i][j] == 'S' || main_cub->c_map->ar_map[i][j] == 'W' || main_cub->c_map->ar_map[i][j] == 'E')
+			if (main_cub->c_map->ar_map[i][j] == 'N'
+				|| main_cub->c_map->ar_map[i][j] == 'S'
+				|| main_cub->c_map->ar_map[i][j] == 'W'
+				|| main_cub->c_map->ar_map[i][j] == 'E')
 			{
+				if (found > 0)
+					return (0);
+				if (!found_pl_sides(main_cub, i, j))
+					return (0);
 				found++;
-				main_cub->pl_pos = ft_calloc(1, sizeof(t_player));
-				main_cub->pl_pos->x = j + 0.5f;
-				main_cub->pl_pos->y = i + 0.5f;
-				if (main_cub->c_map->ar_map[i][j] == 'N')
-					main_cub->pl_pos->angle = 1.5 * M_PI;
-				else if (main_cub->c_map->ar_map[i][j] == 'S')
-					main_cub->pl_pos->angle = 0.5 * M_PI;
-				else if (main_cub->c_map->ar_map[i][j] == 'W')
-					main_cub->pl_pos->angle = 0;
-				else if (main_cub->c_map->ar_map[i][j] == 'E')
-					main_cub->pl_pos->angle = 1 * M_PI;
-				main_cub->c_map->ar_map[i][j] = '0';
 			}
 		}
-	}
-	if (found != 1)
-	{
-		return (0);
 	}
 	return (1);
 }
 
-
 int	check_is_map(t_cub3d *main_cub, int i, int y)
 {
-	int j;
+	int	j;
 
 	y++;
 	while (main_cub->map_file[i])
 	{
-		j = 0;	
+		j = 0;
 		while (main_cub->map_file[i][j])
 		{
-			while (main_cub->map_file[i][j] == ' ' || main_cub->map_file[i][j] == '\t')
+			while (main_cub->map_file[i][j] == ' '
+				|| main_cub->map_file[i][j] == '\t')
 				j++;
-			if (main_cub->map_file[i][j] == '1' || main_cub->map_file[i][j] == '0' 
-				|| main_cub->map_file[i][j] == 'N' || main_cub->map_file[i][j] == 'W'
-				|| main_cub->map_file[i][j] == 'E' || main_cub->map_file[i][j] == 'S'
+			if (main_cub->map_file[i][j] == '1'
+				|| main_cub->map_file[i][j] == '0'
+				|| main_cub->map_file[i][j] == 'N'
+				|| main_cub->map_file[i][j] == 'W'
+				|| main_cub->map_file[i][j] == 'E'
+				|| main_cub->map_file[i][j] == 'S'
 				|| main_cub->map_file[i][j] == '\n')
-			
 				j++;
 			else
-
 				return (0);
 		}
 		i++;

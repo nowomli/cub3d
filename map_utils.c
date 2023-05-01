@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/27 19:32:08 by ccompote          #+#    #+#             */
-/*   Updated: 2023/04/28 17:31:41 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/30 16:23:38 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,39 +14,35 @@
 
 void	rect_map_null(t_map *c_map)
 {
-	char	**new_map;
 	int		i;
 	int		j;
 
 	i = 0;
-	new_map = ft_calloc(c_map->rows + 1, sizeof(char *));
+	c_map->temp_map = ft_calloc(c_map->rows + 1, sizeof(char *));
 	while (i < c_map->rows)
 	{
 		j = 0;
-		new_map[i] = ft_calloc((c_map->column + 1), sizeof(char));
+		c_map->temp_map[i] = ft_calloc((c_map->column + 1), sizeof(char));
 		while (j < c_map->column)
 		{
-			if (c_map->ar_map[i][j]
-				&& (ft_isdigit(c_map->ar_map[i][j])
+			if (c_map->ar_map[i][j] && (ft_isdigit(c_map->ar_map[i][j])
 				|| ft_strchr("NSEW", c_map->ar_map[i][j]))
 				&& (j <= ft_strlen(c_map->ar_map[i])))
-				new_map[i][j] = c_map->ar_map[i][j];
+				c_map->temp_map[i][j] = c_map->ar_map[i][j];
 			else
-				new_map[i][j] = '0';
+				c_map->temp_map[i][j] = '0';
 			j++;
 		}
-		new_map[i][c_map->column] = '\0';
+		c_map->temp_map[i][c_map->column] = '\0';
 		i++;
 	}
-	new_map[i] = NULL;
-	tdimarr_clear(c_map->temp_map);
-	c_map->temp_map = new_map;
+	c_map->temp_map[i] = NULL;
 }
 
 char	**arr_cpy(char **src, int size)
 {
-	int	i;
-	char **dst;
+	int		i;
+	char	**dst;
 
 	i = 0;
 	dst = ft_calloc(sizeof(char *), size + 1);
@@ -77,12 +73,11 @@ bool	dfs(t_map *map, int x, int y)
 
 int	map_holes(t_map *map)
 {
-	
 	bool	res;
 	int		x;
 	int		y;
-	
-	map->temp_map = arr_cpy(map->ar_map, map->rows);
+
+	// map->temp_map = arr_cpy(map->ar_map, map->rows);
 	// main_cub->temp_c_map = ft_calloc(1, sizeof(t_map));
 	// main_cub->temp_c_map->ar_map = arr_cpy(main_cub->c_map->ar_map, main_cub->c_map->rows);
 	// main_cub->temp_c_map->rows = main_cub->c_map->rows;

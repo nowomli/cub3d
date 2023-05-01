@@ -6,7 +6,7 @@
 /*   By: ccompote <ccompote@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 13:45:04 by inovomli          #+#    #+#             */
-/*   Updated: 2023/04/28 17:36:03 by ccompote         ###   ########.fr       */
+/*   Updated: 2023/04/30 16:33:10 by ccompote         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,13 +85,13 @@ void	draw_txtr_line(mlx_texture_t *txtr, t_cub3d *s_cub, t_raycst *rt, int i)
 		if (txtr == s_cub->c_map->so)
 			t.txt_x = txtr->width - t.txt_x;
 		if (txtr == s_cub->c_map->we)
-			t.txt_x1 = txtr->width - t.txt_x1;			
+			t.txt_x1 = txtr->width - t.txt_x1;
 		t.h = min(rt->cl_h, t.cmh);
 		t.n = min(max((int)((t.cmh - t.h) / 2 + t.y), 0), t.cmh);
 		if ((txtr == s_cub->c_map->no) || (txtr == s_cub->c_map->so))
-			mlx_put_pixel(s_cub->image, i, t.n,	gtcl(txtr, t.txt_x, t.txt_y1));
+			mlx_put_pixel(s_cub->image, i, t.n, gtcl(txtr, t.txt_x, t.txt_y1));
 		if ((txtr == s_cub->c_map->we) || (txtr == s_cub->c_map->ea))
-			mlx_put_pixel(s_cub->image, i, t.n,	gtcl(txtr, t.txt_x1, t.txt_y1));
+			mlx_put_pixel(s_cub->image, i, t.n, gtcl(txtr, t.txt_x1, t.txt_y1));
 		++t.y;
 	}
 }
